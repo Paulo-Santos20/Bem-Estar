@@ -1,7 +1,7 @@
 .offers-carousel {
   width: 100%;
   max-width: 1296px;
-  height: 290px;
+  height: 380px; /* AUMENTADO de 290px para 380px */
   margin: 0 auto;
   position: relative;
   background: var(--color-secondary);
@@ -15,7 +15,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--spacing-md) var(--spacing-lg);
+  padding: var(--spacing-lg) var(--spacing-xl); /* AUMENTADO o padding */
   background: var(--gradient-primary);
   color: var(--color-secondary);
   border-bottom: 1px solid var(--color-border);
@@ -24,35 +24,35 @@
 .offers-carousel__title-section {
   display: flex;
   align-items: center;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md); /* AUMENTADO o gap */
 }
 
 .offers-carousel__icon {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl); /* AUMENTADO de var(--font-size-xl) */
   animation: pulse 2s ease-in-out infinite;
 }
 
 .offers-carousel__title {
-  font-size: var(--font-size-lg);
+  font-size: var(--font-size-xl); /* AUMENTADO de var(--font-size-lg) */
   font-weight: 700;
   margin: 0;
   color: var(--color-secondary);
 }
 
 .offers-carousel__subtitle {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base); /* AUMENTADO de var(--font-size-sm) */
   opacity: 0.9;
   font-weight: 500;
 }
 
 .offers-carousel__controls {
   display: flex;
-  gap: var(--spacing-sm);
+  gap: var(--spacing-md); /* AUMENTADO o gap */
 }
 
 .offers-carousel__control {
-  width: 40px;
-  height: 40px;
+  width: 48px; /* AUMENTADO de 40px */
+  height: 48px;
   border: 2px solid rgba(255, 255, 255, 0.3);
   background: rgba(255, 255, 255, 0.1);
   border-radius: 50%;
@@ -77,31 +77,41 @@
 }
 
 .offers-carousel__arrow {
-  font-size: var(--font-size-xl);
+  font-size: var(--font-size-2xl); /* AUMENTADO de var(--font-size-xl) */
   font-weight: bold;
   color: var(--color-secondary);
 }
 
 .offers-carousel__container {
-  height: calc(100% - 60px - 20px); /* Total - header - indicators */
+  height: calc(100% - 80px - 24px); /* AJUSTADO para o header maior */
   overflow: hidden;
   position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .offers-carousel__track {
   display: flex;
   height: 100%;
   will-change: transform;
+  justify-content: flex-start;
+  align-items: stretch;
 }
 
 .offers-carousel__item {
   flex: 0 0 25%; /* 4 itens por view */
-  padding: var(--spacing-md);
+  padding: var(--spacing-lg); /* AUMENTADO de var(--spacing-md) */
   box-sizing: border-box;
+  display: flex;
+  justify-content: center;
+  align-items: stretch;
 }
 
 /* Cards das Ofertas */
 .offer-card {
+  width: 100%;
+  max-width: 300px; /* AUMENTADO de 280px */
   height: 100%;
   background: var(--color-background);
   border-radius: var(--border-radius-lg);
@@ -111,6 +121,7 @@
   transition: all var(--transition-normal);
   display: flex;
   flex-direction: column;
+  margin: 0 auto;
 }
 
 .offer-card:hover {
@@ -121,17 +132,17 @@
 
 .offer-card__badge {
   position: absolute;
-  top: var(--spacing-sm);
-  left: var(--spacing-sm);
+  top: var(--spacing-md); /* AUMENTADO de var(--spacing-sm) */
+  left: var(--spacing-md);
   z-index: 2;
 }
 
 .offer-card__badge-text {
   background: var(--gradient-highlight);
   color: var(--color-secondary);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md); /* AUMENTADO o padding */
   border-radius: var(--border-radius-full);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm); /* AUMENTADO de var(--font-size-xs) */
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -139,23 +150,23 @@
 
 .offer-card__discount {
   position: absolute;
-  top: var(--spacing-sm);
-  right: var(--spacing-sm);
+  top: var(--spacing-md); /* AUMENTADO de var(--spacing-sm) */
+  right: var(--spacing-md);
   z-index: 2;
 }
 
 .offer-card__discount-text {
   background: var(--color-primary);
   color: var(--color-secondary);
-  padding: var(--spacing-xs) var(--spacing-sm);
+  padding: var(--spacing-sm) var(--spacing-md); /* AUMENTADO o padding */
   border-radius: var(--border-radius-md);
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm); /* AUMENTADO de var(--font-size-xs) */
   font-weight: 700;
 }
 
 .offer-card__image {
   width: 100%;
-  height: 80px;
+  height: 120px; /* AUMENTADO de 80px */
   overflow: hidden;
   background: var(--color-secondary);
   display: flex;
@@ -175,15 +186,15 @@
 }
 
 .offer-card__content {
-  padding: var(--spacing-sm);
+  padding: var(--spacing-md); /* AUMENTADO de var(--spacing-sm) */
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
+  gap: var(--spacing-sm); /* AUMENTADO de var(--spacing-xs) */
 }
 
 .offer-card__category {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm); /* AUMENTADO de var(--font-size-xs) */
   color: var(--color-primary);
   font-weight: 600;
   text-transform: uppercase;
@@ -191,22 +202,22 @@
 }
 
 .offer-card__title {
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-base); /* AUMENTADO de var(--font-size-sm) */
   font-weight: 700;
   color: var(--color-text);
   margin: 0;
   line-height: 1.3;
   display: -webkit-box;
-  -webkit-line-clamp: 1;
+  -webkit-line-clamp: 2; /* AUMENTADO para 2 linhas */
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
 
 .offer-card__description {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm); /* AUMENTADO de var(--font-size-xs) */
   color: var(--color-text-light);
   margin: 0;
-  line-height: 1.3;
+  line-height: 1.4; /* MELHORADO */
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
@@ -216,18 +227,18 @@
 .offer-card__pricing {
   display: flex;
   flex-direction: column;
-  gap: var(--spacing-xs);
-  margin: var(--spacing-xs) 0;
+  gap: var(--spacing-sm); /* AUMENTADO de var(--spacing-xs) */
+  margin: var(--spacing-sm) 0;
 }
 
 .offer-card__original-price {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm); /* AUMENTADO de var(--font-size-xs) */
   color: var(--color-text-light);
   text-decoration: line-through;
 }
 
 .offer-card__offer-price {
-  font-size: var(--font-size-base);
+  font-size: var(--font-size-lg); /* AUMENTADO de var(--font-size-base) */
   font-weight: 700;
   color: var(--color-primary);
 }
@@ -235,16 +246,16 @@
 .offer-card__stock {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
-  margin: var(--spacing-xs) 0;
+  gap: var(--spacing-sm); /* AUMENTADO de var(--spacing-xs) */
+  margin: var(--spacing-sm) 0;
 }
 
 .offer-card__stock-icon {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm); /* AUMENTADO de var(--font-size-xs) */
 }
 
 .offer-card__stock-text {
-  font-size: var(--font-size-xs);
+  font-size: var(--font-size-sm); /* AUMENTADO de var(--font-size-xs) */
   color: var(--color-text-light);
 }
 
@@ -252,22 +263,22 @@
   margin-top: auto;
   width: 100%;
   justify-content: center;
-  font-size: var(--font-size-xs) !important;
-  padding: var(--spacing-xs) !important;
+  font-size: var(--font-size-sm) !important; /* AUMENTADO de var(--font-size-xs) */
+  padding: var(--spacing-sm) !important; /* AUMENTADO de var(--spacing-xs) */
 }
 
 /* Indicadores */
 .offers-carousel__indicators {
   display: flex;
   justify-content: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-sm);
+  gap: var(--spacing-md); /* AUMENTADO o gap */
+  padding: var(--spacing-md); /* AUMENTADO de var(--spacing-sm) */
   background: var(--color-background);
 }
 
 .offers-carousel__indicator {
-  width: 8px;
-  height: 8px;
+  width: 10px; /* AUMENTADO de 8px */
+  height: 10px;
   border-radius: 50%;
   border: none;
   background: var(--color-border);
@@ -277,7 +288,7 @@
 
 .offers-carousel__indicator--active {
   background: var(--color-primary);
-  transform: scale(1.2);
+  transform: scale(1.3); /* AUMENTADO de 1.2 */
 }
 
 .offers-carousel__indicator:hover {
@@ -288,7 +299,8 @@
 @media (max-width: 1200px) {
   .offers-carousel {
     max-width: 100%;
-    height: 280px;
+    height: 360px; /* AJUSTADO proporcionalmente */
+    margin: 0 var(--spacing-md);
   }
   
   .offers-carousel__item {
@@ -298,7 +310,8 @@
 
 @media (max-width: 768px) {
   .offers-carousel {
-    height: 320px;
+    height: 400px; /* AJUSTADO para mobile */
+    margin: 0 var(--spacing-sm);
   }
   
   .offers-carousel__item {
@@ -306,11 +319,11 @@
   }
   
   .offers-carousel__header {
-    padding: var(--spacing-sm) var(--spacing-md);
+    padding: var(--spacing-md) var(--spacing-lg);
   }
   
   .offers-carousel__title {
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-lg);
   }
   
   .offers-carousel__subtitle {
@@ -318,19 +331,19 @@
   }
   
   .offer-card__image {
-    height: 100px;
+    height: 140px; /* AUMENTADO para mobile */
   }
 }
 
 @media (max-width: 480px) {
   .offers-carousel {
-    height: 350px;
-    margin: 0 var(--spacing-sm);
+    height: 420px; /* AUMENTADO para mobile pequeno */
+    margin: 0 var(--spacing-xs);
   }
   
   .offers-carousel__item {
     flex: 0 0 100%; /* 1 item por view */
-    padding: var(--spacing-sm);
+    padding: var(--spacing-md);
   }
   
   .offers-carousel__header {
@@ -340,11 +353,15 @@
   }
   
   .offer-card__content {
-    padding: var(--spacing-md);
+    padding: var(--spacing-lg);
   }
   
   .offer-card__image {
-    height: 120px;
+    height: 160px; /* AUMENTADO ainda mais para mobile */
+  }
+  
+  .offer-card {
+    max-width: none;
   }
 }
 

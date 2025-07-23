@@ -1,4 +1,5 @@
 import React from 'react';
+import Hero from '../../components/features/Hero/Hero';
 import OffersCarousel from '../../components/features/OffersCarousel/OffersCarousel';
 import ProductCategories from '../../components/features/ProductCategories/ProductCategories';
 import ServicesSection from '../../components/features/ServicesSection/ServicesSection';
@@ -6,9 +7,11 @@ import Testimonials from '../../components/features/Testimonials/Testimonials';
 
 const Home = () => {
   return (
-    <div className="home">     
+    <div className="home">
+      <Hero />
+      
       {/* Carrossel de Ofertas */}
-      <section className="section">
+      <section className="offers-section">
         <div className="container">
           <OffersCarousel />
         </div>

@@ -171,6 +171,17 @@ const OffersCarousel = () => {
     }).format(price);
   };
 
+  const handleImageError = (e) => {
+    e.target.src = `data:image/svg+xml;base64,${btoa(`
+      <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <rect width="200" height="200" fill="#F8F9FA"/>
+        <circle cx="100" cy="100" r="40" fill="#E53935"/>
+        <path d="M85 95h30v10H85V95z" fill="white"/>
+        <path d="M95 85h10v30H95V85z" fill="white"/>
+      </svg>
+    `)}`;
+  };
+
   return (
     <div className="offers-carousel">
       <div className="offers-carousel__header">
@@ -227,16 +238,7 @@ const OffersCarousel = () => {
                   <img 
                     src={offer.image} 
                     alt={offer.title}
-                    onError={(e) => {
-                      e.target.src = `data:image/svg+xml;base64,${btoa(`
-                        <svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <rect width="200" height="200" fill="#F8F9FA"/>
-                          <circle cx="100" cy="100" r="40" fill="#E53935"/>
-                          <path d="M85 95h30v10H85V95z" fill="white"/>
-                          <path d="M95 85h10v30H95V85z" fill="white"/>
-                        </svg>
-                      `)}`;
-                    }}
+                    onError={handleImageError}
                   />
                 </div>
 

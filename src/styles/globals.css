@@ -132,3 +132,26 @@ a:hover {
     padding: 0 var(--spacing-sm);
   }
 }
+
+/* Seção de Ofertas */
+.offers-section {
+  padding: var(--spacing-2xl) 0;
+  background: var(--color-background);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.offers-section .container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 1400px;
+}
+
+/* Garantir que o carrossel seja visível */
+.offers-carousel {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
