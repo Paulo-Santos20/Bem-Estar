@@ -1,0 +1,27 @@
+.layout {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.layout__main {
+  flex: 1;
+  width: 100%;
+  padding-top: 80px; /* Espaço para o header fixo */
+  overflow-x: hidden;
+}
+
+/* Responsividade para o espaçamento do header */
+@media (max-width: 768px) {
+  .layout__main {
+    padding-top: 70px;
+  }
+}
+
+@media (max-width: 480px) {
+  .layout__main {
+    padding-top: 65px;
+  }
+}
