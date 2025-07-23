@@ -9,19 +9,25 @@
 .layout__main {
   flex: 1;
   width: 100%;
-  padding-top: 80px; /* Espaço para o header fixo */
+  padding-top: 120px; /* Diminuído de 140px para 120px devido ao header inferior menor */
   overflow-x: hidden;
 }
 
 /* Responsividade para o espaçamento do header */
+@media (max-width: 1024px) {
+  .layout__main {
+    padding-top: 100px; /* Diminuído de 120px */
+  }
+}
+
 @media (max-width: 768px) {
   .layout__main {
-    padding-top: 70px;
+    padding-top: 80px; /* Header mobile é menor */
   }
 }
 
 @media (max-width: 480px) {
   .layout__main {
-    padding-top: 65px;
+    padding-top: 70px;
   }
 }
