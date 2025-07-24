@@ -25,7 +25,8 @@ const OffersCarousel = () => {
       discount: 44,
       image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=280&h=200&fit=crop',
       category: 'Medicamentos',
-      rating: 4.8
+      rating: 4.8,
+      slug: 'paracetamol-500mg'
     },
     {
       id: 2,
@@ -36,7 +37,8 @@ const OffersCarousel = () => {
       discount: 36,
       image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=280&h=200&fit=crop',
       category: 'Vitaminas',
-      rating: 4.9
+      rating: 4.9,
+      slug: 'vitamina-c-1000mg'
     },
     {
       id: 3,
@@ -47,7 +49,8 @@ const OffersCarousel = () => {
       discount: 30,
       image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=280&h=200&fit=crop',
       category: 'Beleza',
-      rating: 4.7
+      rating: 4.7,
+      slug: 'protetor-solar-fps-60'
     },
     {
       id: 4,
@@ -58,7 +61,8 @@ const OffersCarousel = () => {
       discount: 39,
       image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=280&h=200&fit=crop',
       category: 'Medicamentos',
-      rating: 4.6
+      rating: 4.6,
+      slug: 'dipirona-500mg'
     },
     {
       id: 5,
@@ -69,7 +73,8 @@ const OffersCarousel = () => {
       discount: 32,
       image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=280&h=200&fit=crop',
       category: 'Suplementos',
-      rating: 4.8
+      rating: 4.8,
+      slug: 'omega-3-1000mg'
     },
     {
       id: 6,
@@ -80,7 +85,8 @@ const OffersCarousel = () => {
       discount: 32,
       image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=280&h=200&fit=crop',
       category: 'Higiene',
-      rating: 4.5
+      rating: 4.5,
+      slug: 'shampoo-anticaspa'
     },
     {
       id: 7,
@@ -91,7 +97,8 @@ const OffersCarousel = () => {
       discount: 33,
       image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=280&h=200&fit=crop',
       category: 'Vitaminas',
-      rating: 4.7
+      rating: 4.7,
+      slug: 'multivitaminico'
     },
     {
       id: 8,
@@ -102,7 +109,8 @@ const OffersCarousel = () => {
       discount: 33,
       image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=280&h=200&fit=crop',
       category: 'Beleza',
-      rating: 4.9
+      rating: 4.9,
+      slug: 'hidratante-facial'
     }
   ], []);
 
@@ -177,8 +185,76 @@ const OffersCarousel = () => {
     setIsAutoPlaying(true);
   }, []);
 
+  // Navegar para página do produto
+  const handleProductClick = useCallback((offer) => {
+    // Por enquanto, simular navegação com console.log
+    // Em uma aplicação real, você usaria React Router
+    console.log('Navegando para produto:', offer.slug);
+    
+    // Exemplo de como seria com React Router:
+    // navigate(`/produto/${offer.slug}`);
+    
+    // Por enquanto, mostrar um alert
+    alert(`Redirecionando para a página do produto: ${offer.title}`);
+  }, []);
+
+  // Criar notificação melhorada
+  const createNotification = useCallback((offer, type = 'cart') => {
+    // Remover notificações existentes
+    const existingNotifications = document.querySelectorAll('.cart-notification');
+    existingNotifications.forEach(notification => {
+      document.body.removeChild(notification);
+    });
+
+    const notification = document.createElement('div');
+    notification.className = 'cart-notification';
+    
+    const icon = type === 'cart' ? '🛒✅' : '❤️';
+    const message = type === 'cart' 
+      ? `${offer.title} adicionado ao carrinho!` 
+      : `${offer.title} adicionado aos favoritos!`;
+    
+    notification.innerHTML = `
+      <div class="cart-notification__content">
+        <div class="cart-notification__header">
+          <span class="cart-notification__icon">${icon}</span>
+          <button class="cart-notification__close" onclick="this.parentElement.parentElement.parentElement.remove()">×</button>
+        </div>
+        <div class="cart-notification__body">
+          <img src="${offer.image}" alt="${offer.title}" class="cart-notification__image">
+          <div class="cart-notification__info">
+            <span class="cart-notification__title">${offer.title}</span>
+            <span class="cart-notification__price">${formatPrice(offer.offerPrice)}</span>
+            <span class="cart-notification__message">${message}</span>
+          </div>
+        </div>
+      </div>
+    `;
+    
+    document.body.appendChild(notification);
+
+    // Mostrar notificação
+    setTimeout(() => {
+      notification.classList.add('cart-notification--show');
+    }, 100);
+
+    // Auto-remover após 5 segundos
+    setTimeout(() => {
+      if (document.body.contains(notification)) {
+        notification.classList.remove('cart-notification--show');
+        setTimeout(() => {
+          if (document.body.contains(notification)) {
+            document.body.removeChild(notification);
+          }
+        }, 300);
+      }
+    }, 5000);
+  }, []);
+
   // Adicionar produto ao carrinho usando o contexto
-  const handleAddToCart = useCallback((offer) => {
+  const handleAddToCart = useCallback((e, offer) => {
+    e.stopPropagation(); // Prevenir navegação do card
+    
     addToCart(offer);
     
     // Feedback visual com animação
@@ -190,36 +266,21 @@ const OffersCarousel = () => {
       }, 600);
     }
 
-    // Criar notificação visual
-    const notification = document.createElement('div');
-    notification.className = 'cart-notification';
-    notification.innerHTML = `
-      <div class="cart-notification__content">
-        <span class="cart-notification__icon">✅</span>
-        <span class="cart-notification__text">${offer.title} adicionado ao carrinho!</span>
-      </div>
-    `;
-    document.body.appendChild(notification);
-
-    setTimeout(() => {
-      notification.classList.add('cart-notification--show');
-    }, 100);
-
-    setTimeout(() => {
-      notification.classList.remove('cart-notification--show');
-      setTimeout(() => {
-        document.body.removeChild(notification);
-      }, 300);
-    }, 3000);
-  }, [addToCart]);
+    // Criar notificação melhorada
+    createNotification(offer, 'cart');
+  }, [addToCart, createNotification]);
 
   // Adicionar aos favoritos
-  const handleAddToWishlist = useCallback((offer) => {
+  const handleAddToWishlist = useCallback((e, offer) => {
+    e.stopPropagation(); // Prevenir navegação do card
+    
     setWishlist(prevWishlist => {
       const isAlreadyInWishlist = prevWishlist.find(item => item.id === offer.id);
       if (isAlreadyInWishlist) {
         return prevWishlist.filter(item => item.id !== offer.id);
       } else {
+        // Criar notificação apenas quando adicionar
+        createNotification(offer, 'wishlist');
         return [...prevWishlist, offer];
       }
     });
@@ -232,7 +293,7 @@ const OffersCarousel = () => {
         button.classList.remove('offer-card__wishlist-button--pulse');
       }, 600);
     }
-  }, []);
+  }, [createNotification]);
 
   // Verificar se item está nos favoritos
   const isInWishlist = useCallback((offerId) => {
@@ -314,7 +375,18 @@ const OffersCarousel = () => {
         >
           {offers.map((offer) => (
             <div key={offer.id} className="offers-carousel__item">
-              <div className="offer-card">
+              <div 
+                className="offer-card offer-card--clickable"
+                onClick={() => handleProductClick(offer)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    handleProductClick(offer);
+                  }
+                }}
+                aria-label={`Ver detalhes do produto ${offer.title}`}
+              >
                 {/* Desconto no topo */}
                 <div className="offer-card__discount">
                   <span className="offer-card__discount-text">{offer.discount}% OFF</span>
@@ -337,13 +409,9 @@ const OffersCarousel = () => {
                     loading="lazy"
                   />
                   <div className="offer-card__image-overlay">
-                    <button 
-                      className="offer-card__quick-view"
-                      onClick={() => console.log('Ver detalhes:', offer.id)}
-                      aria-label={`Ver detalhes de ${offer.title}`}
-                    >
-                      👁️ Ver Detalhes
-                    </button>
+                    <span className="offer-card__click-hint">
+                      👁️ Clique para ver detalhes
+                    </span>
                   </div>
                 </div>
 
@@ -375,7 +443,7 @@ const OffersCarousel = () => {
                         className={`offer-card__cart-button ${
                           isInCart(offer.id) ? 'offer-card__cart-button--active' : ''
                         }`}
-                        onClick={() => handleAddToCart(offer)}
+                        onClick={(e) => handleAddToCart(e, offer)}
                         data-product-id={offer.id}
                         aria-label="Adicionar ao carrinho"
                         title="Adicionar ao carrinho"
@@ -386,7 +454,7 @@ const OffersCarousel = () => {
                         className={`offer-card__wishlist-button ${
                           isInWishlist(offer.id) ? 'offer-card__wishlist-button--active' : ''
                         }`}
-                        onClick={() => handleAddToWishlist(offer)}
+                        onClick={(e) => handleAddToWishlist(e, offer)}
                         data-wishlist-id={offer.id}
                         aria-label="Adicionar aos favoritos"
                         title={isInWishlist(offer.id) ? "Remover dos favoritos" : "Adicionar aos favoritos"}
