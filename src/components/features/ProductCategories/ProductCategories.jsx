@@ -1,84 +1,116 @@
 import React from 'react';
-import ProductCategoryCard from './ProductCategoryCard/ProductCategoryCard';
-import Button from '../../ui/Button/Button';
-import { categories, mainCategories, getCategoryById } from '../../../data/categories';
 import './ProductCategories.css';
 
 const ProductCategories = () => {
-  const handleCategoryClick = (categoryId) => {
-    console.log('Navegando para categoria:', categoryId);
-    // Implementar navegação para categoria
-    // navigate(`/categoria/${categoryId}`);
-  };
+  const categories = [
+    {
+      id: 1,
+      name: 'Medicamentos',
+      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=200&h=200&fit=crop&crop=center',
+      href: '#medicamentos',
+      description: 'Remédios e tratamentos',
+      icon: '💊'
+    },
+    {
+      id: 2,
+      name: 'Vitaminas',
+      image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=200&h=200&fit=crop&crop=center',
+      href: '#vitaminas',
+      description: 'Suplementos e vitaminas',
+      icon: '🌿'
+    },
+    {
+      id: 3,
+      name: 'Beleza',
+      image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=200&h=200&fit=crop&crop=center',
+      href: '#beleza',
+      description: 'Cosméticos e cuidados',
+      icon: '💄'
+    },
+    {
+      id: 4,
+      name: 'Higiene',
+      image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=200&h=200&fit=crop&crop=center',
+      href: '#higiene',
+      description: 'Produtos de higiene',
+      icon: '🧼'
+    },
+    {
+      id: 5,
+      name: 'Suplementos',
+      image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=200&h=200&fit=crop&crop=center',
+      href: '#suplementos',
+      description: 'Proteínas e suplementos',
+      icon: '💪'
+    },
+    {
+      id: 6,
+      name: 'Infantil',
+      image: 'https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?w=200&h=200&fit=crop&crop=center',
+      href: '#infantil',
+      description: 'Produtos para bebês',
+      icon: '👶'
+    }
+  ];
 
-  const handleViewAllCategories = () => {
-    console.log('Ver todas as categorias');
-    // Implementar navegação para página de categorias
-    // navigate('/categorias');
+  const handleCategoryClick = (category) => {
+    console.log('Categoria clicada:', category.name);
+    // Aqui você pode adicionar navegação ou filtros
   };
-
-  // Obter as categorias principais e algumas adicionais
-  const displayCategories = [
-    ...mainCategories.map(id => getCategoryById(id)).filter(Boolean),
-    getCategoryById('saude'),
-    getCategoryById('cosmeticos'),
-    getCategoryById('cuidados-diarios'),
-    getCategoryById('pet')
-  ].filter((category, index, self) => 
-    category && self.findIndex(c => c.id === category.id) === index
-  );
 
   return (
     <section className="product-categories">
       <div className="container">
         <div className="product-categories__header">
-          <div className="product-categories__title-section">
-            <span className="product-categories__icon">🏪</span>
-            <div className="product-categories__text">
-              <h2 className="product-categories__title">Nossas Categorias</h2>
-              <p className="product-categories__subtitle">
-                Encontre tudo o que você precisa para sua saúde e bem-estar
-              </p>
-            </div>
-          </div>
-          
-          <Button
-            variant="outline"
-            size="md"
-            onClick={handleViewAllCategories}
-            className="product-categories__view-all"
-          >
-            Ver Todas as Categorias
-          </Button>
+          <h2 className="product-categories__title">
+            <span className="product-categories__title-icon">🏷️</span>
+            Categorias Mais Procuradas
+          </h2>
+          <p className="product-categories__subtitle">
+            Encontre rapidamente o que você precisa nas nossas categorias mais vendidas
+          </p>
         </div>
 
         <div className="product-categories__grid">
-          {displayCategories.map((category) => (
-            <ProductCategoryCard
+          {categories.map((category) => (
+            <a
               key={category.id}
-              category={category}
-              onClick={() => handleCategoryClick(category.id)}
-            />
+              href={category.href}
+              className="product-categories__item"
+              onClick={(e) => {
+                e.preventDefault();
+                handleCategoryClick(category);
+              }}
+            >
+              <div className="product-categories__image-container">
+                <div className="product-categories__image-wrapper">
+                  <img
+                    src={category.image}
+                    alt={category.name}
+                    className="product-categories__image"
+                    loading="lazy"
+                  />
+                  <div className="product-categories__overlay">
+                    <span className="product-categories__icon">
+                      {category.icon}
+                    </span>
+                  </div>
+                </div>
+                <div className="product-categories__badge">
+                  <span className="product-categories__badge-text">Top</span>
+                </div>
+              </div>
+              
+              <div className="product-categories__content">
+                <h3 className="product-categories__name">
+                  {category.name}
+                </h3>
+                <p className="product-categories__description">
+                  {category.description}
+                </p>
+              </div>
+            </a>
           ))}
-        </div>
-
-        <div className="product-categories__stats">
-          <div className="product-categories__stat">
-            <span className="product-categories__stat-number">500+</span>
-            <span className="product-categories__stat-label">Produtos</span>
-          </div>
-          <div className="product-categories__stat">
-            <span className="product-categories__stat-number">50+</span>
-            <span className="product-categories__stat-label">Marcas</span>
-          </div>
-          <div className="product-categories__stat">
-            <span className="product-categories__stat-number">24h</span>
-            <span className="product-categories__stat-label">Entrega</span>
-          </div>
-          <div className="product-categories__stat">
-            <span className="product-categories__stat-number">100%</span>
-            <span className="product-categories__stat-label">Qualidade</span>
-          </div>
         </div>
       </div>
     </section>

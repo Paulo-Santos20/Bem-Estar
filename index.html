@@ -1,13 +1,235 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + React</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <!-- Meta Tags Essenciais -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <!-- SEO Meta Tags -->
+  <title>Farmácia Bem Estar - Medicamentos, Vitaminas e Produtos de Saúde</title>
+  <meta name="description" content="Farmácia Bem Estar: sua farmácia de confiança com medicamentos, vitaminas, produtos de beleza e higiene. Atendimento especializado e entrega rápida." />
+  <meta name="keywords" content="farmácia, medicamentos, vitaminas, suplementos, beleza, higiene, saúde, bem-estar, paracetamol, dipirona, protetor solar" />
+  <meta name="author" content="Farmácia Bem Estar" />
+  <meta name="robots" content="index, follow" />
+  <meta name="language" content="pt-BR" />
+  
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://farmaciabemestar.vercel.app//" />
+  <meta property="og:title" content="Farmácia Bem Estar - Sua Saúde em Primeiro Lugar" />
+  <meta property="og:description" content="Encontre medicamentos, vitaminas e produtos de saúde com qualidade e preços especiais. Atendimento farmacêutico especializado." />
+  <meta property="og:image" content="https://farmaciabemestar.vercel.app//og-image.jpg" />
+  <meta property="og:image:width" content="1200" />
+  <meta property="og:image:height" content="630" />
+  <meta property="og:site_name" content="Farmácia Bem Estar" />
+  <meta property="og:locale" content="pt_BR" />
+  
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://farmaciabemestar.vercel.app//" />
+  <meta name="twitter:title" content="Farmácia Bem Estar - Sua Saúde em Primeiro Lugar" />
+  <meta name="twitter:description" content="Encontre medicamentos, vitaminas e produtos de saúde com qualidade e preços especiais." />
+  <meta name="twitter:image" content="https://farmaciabemestar.vercel.app//twitter-image.jpg" />
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.ico" />
+  <meta name="theme-color" content="#E53935" />
+  
+  <!-- Preconnect para Performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="preconnect" href="https://images.unsplash.com" />
+  
+  <!-- Google Fonts Otimizadas -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  
+  <!-- Canonical URL -->
+  <link rel="canonical" href="https://farmaciabemestar.vercel.app//" />
+  
+  <!-- Structured Data - JSON-LD -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Pharmacy",
+    "name": "Farmácia Bem Estar",
+    "description": "Farmácia especializada em medicamentos, vitaminas, suplementos e produtos de saúde e beleza",
+    "url": "https://farmaciabemestar.vercel.app/",
+    "logo": "https://farmaciabemestar.vercel.app//logo.png",
+    "image": "https://farmaciabemestar.vercel.app//farmacia-foto.jpg",
+    "telephone": "+55-11-99999-9999",
+    "email": "contato@farmacia-bem-estar.com.br",
+    "address": {
+      "@type": "PostalAddress",
+      "streetAddress": "Rua da Saúde, 123",
+      "addressLocality": "São Paulo",
+      "addressRegion": "SP",
+      "postalCode": "01234-567",
+      "addressCountry": "BR"
+    },
+    "geo": {
+      "@type": "GeoCoordinates",
+      "latitude": "-23.5505",
+      "longitude": "-46.6333"
+    },
+    "openingHoursSpecification": [
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+        "opens": "08:00",
+        "closes": "22:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": "Saturday",
+        "opens": "08:00",
+        "closes": "20:00"
+      },
+      {
+        "@type": "OpeningHoursSpecification",
+        "dayOfWeek": "Sunday",
+        "opens": "09:00",
+        "closes": "18:00"
+      }
+    ],
+    "priceRange": "$$",
+    "currenciesAccepted": "BRL",
+    "paymentAccepted": "Cash, Credit Card, Debit Card, PIX",
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Produtos da Farmácia",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Product",
+            "name": "Medicamentos"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Product",
+            "name": "Vitaminas e Suplementos"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Product",
+            "name": "Produtos de Beleza"
+          }
+        }
+      ]
+    },
+    "sameAs": [
+      "https://www.facebook.com/farmacia-bem-estar",
+      "https://www.instagram.com/farmacia_bem_estar",
+      "https://wa.me/5511999999999"
+    ]
+  }
+  </script>
+  
+  <!-- Critical CSS Inline -->
+  <style>
+    /* Critical CSS será injetado aqui durante o build */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      background-color: #fff;
+    }
+    
+    #root {
+      min-height: 100vh;
+    }
+    
+    /* Loading spinner */
+    .loading-spinner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 50px;
+      height: 50px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #E53935;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      z-index: 9999;
+    }
+    
+    @keyframes spin {
+      0% { transform: translate(-50%, -50%) rotate(0deg); }
+      100% { transform: translate(-50%, -50%) rotate(360deg); }
+    }
+  </style>
+  
+  <!-- PWA Meta Tags -->
+  <meta name="application-name" content="Farmácia Bem Estar" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Bem Estar" />
+</head>
+
+<body>
+  <!-- Loading Spinner -->
+  <div id="loading-spinner" class="loading-spinner"></div>
+  
+  <!-- Skip to Content (Acessibilidade) -->
+  <a href="#main-content" class="skip-to-content" style="position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden;">
+    Pular para o conteúdo principal
+  </a>
+  
+  <!-- Root Element -->
+  <div id="root"></div>
+  
+  <!-- Fallback para JavaScript Desabilitado -->
+  <noscript>
+    <div style="text-align: center; padding: 50px; font-family: Arial, sans-serif;">
+      <h1>🏥 Farmácia Bem Estar</h1>
+      <p>Para uma melhor experiência, por favor habilite o JavaScript em seu navegador.</p>
+      <p>Entre em contato conosco:</p>
+      <p>📞 (81) 99528-4440</p>
+      <p>📧 contato@farmacia-bem-estar.com.br</p>
+    </div>
+  </noscript>
+  
+  <!-- Scripts de inicialização -->
+  <script>
+    // Remove loading spinner quando a página carregar
+    window.addEventListener('load', function() {
+      const spinner = document.getElementById('loading-spinner');
+      if (spinner) {
+        spinner.style.display = 'none';
+      }
+    });
+  </script>
+  
+  <!-- Main App Script -->
+  <script type="module" src="/src/main.jsx"></script>
+  
+  <!-- Schema.org Breadcrumb -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Início",
+        "item": "https://farmaciabemestar.vercel.app//"
+      }
+    ]
+  }
+  </script>
+</body>
 </html>

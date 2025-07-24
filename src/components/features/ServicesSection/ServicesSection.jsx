@@ -22,7 +22,7 @@ const ServicesSection = () => {
 
   const handleContactWhatsApp = () => {
     const message = encodeURIComponent('Olá! Gostaria de saber mais sobre os serviços da farmácia.');
-    window.open(`https://wa.me/5511999999999?text=${message}`, '_blank');
+    window.open(`https://wa.me/5581995284440?text=${message}`, '_blank');
   };
 
   return (
@@ -95,8 +95,8 @@ const ServicesSection = () => {
             <div className="services-section__info-icon">📞</div>
             <div className="services-section__info-content">
               <h4>Contato</h4>
-              <p>Telefone: (11) 99999-9999</p>
-              <p>WhatsApp: (11) 99999-9999</p>
+              <p>Telefone: (81) 99528-4440</p>
+              <p>WhatsApp: (81) 99528-4440</p>
             </div>
           </div>
 

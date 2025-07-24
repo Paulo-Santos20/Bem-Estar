@@ -3,14 +3,13 @@ import Hero from '../../components/features/Hero/Hero';
 import OffersCarousel from '../../components/features/OffersCarousel/OffersCarousel';
 import ProductCategories from '../../components/features/ProductCategories/ProductCategories';
 import ServicesSection from '../../components/features/ServicesSection/ServicesSection';
-import Testimonials from '../../components/features/Testimonials/Testimonials';
 
 const Home = () => {
   return (
     <div className="home">
       <Hero />
       
-      {/* Seção de Ofertas - Forçada para aparecer */}
+      {/* Seção de Ofertas */}
       <section 
         className="offers-section"       
       >
@@ -22,7 +21,6 @@ const Home = () => {
 
       <ProductCategories />
       <ServicesSection />
-      <Testimonials />
     </div>
   );
 };

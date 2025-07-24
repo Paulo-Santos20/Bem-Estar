@@ -25,7 +25,7 @@ const Footer = () => {
           <div className="footer__section">
             <h4>Contato</h4>
             <div className="footer__contact">
-              <p>📞 (11) 99999-9999</p>
+              <p>📞 (81) 99528-4440</p>
               <p>📧 contato@bemestar.com.br</p>
               <p>📍 Rua da Saúde, 123 - São Paulo, SP</p>
             </div>
