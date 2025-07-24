@@ -15,7 +15,7 @@ const ProductCategoryCard = ({ category, onClick }) => {
     'vitaminas-suplementos': {
       image: '/api/placeholder/300/200',
       productCount: 80,
-      popularItems: ['Vitamina C', 'Vitamina D3', 'Ômega 3'],
+      popularItems: ['Vitamina C', 'Vitamina D3', 'Omega 3'],
       color: '#FF9800'
     },
     'beleza': {
@@ -27,19 +27,19 @@ const ProductCategoryCard = ({ category, onClick }) => {
     'mamae-bebe': {
       image: '/api/placeholder/300/200',
       productCount: 90,
-      popularItems: ['Fraldas', 'Lenços', 'Pomadas'],
+      popularItems: ['Fraldas', 'Lencos', 'Pomadas'],
       color: '#9C27B0'
     },
     'saude': {
       image: '/api/placeholder/300/200',
       productCount: 70,
-      popularItems: ['Termômetro', 'Medidor Pressão', 'Testes'],
+      popularItems: ['Termometro', 'Medidor Pressao', 'Testes'],
       color: '#2196F3'
     },
     'cosmeticos': {
       image: '/api/placeholder/300/200',
       productCount: 60,
-      popularItems: ['Maquiagem', 'Perfumes', 'Dermocosméticos'],
+      popularItems: ['Maquiagem', 'Perfumes', 'Dermocosmeticos'],
       color: '#673AB7'
     },
     'cuidados-diarios': {
@@ -64,13 +64,18 @@ const ProductCategoryCard = ({ category, onClick }) => {
   };
 
   const handleImageError = (e) => {
-    e.target.src = `data:image/svg+xml;base64,${btoa(`
+    // Criar SVG sem caracteres especiais
+    const svgContent = `
       <svg width="300" height="200" viewBox="0 0 300 200" fill="none" xmlns="http://www.w3.org/2000/svg">
         <rect width="300" height="200" fill="#F8F9FA"/>
         <circle cx="150" cy="100" r="30" fill="${data.color}"/>
-        <text x="150" y="105" text-anchor="middle" fill="white" font-size="20" font-weight="bold">${category.icon}</text>
+        <text x="150" y="105" text-anchor="middle" fill="white" font-size="20" font-weight="bold">${category.icon || '+'}</text>
       </svg>
-    `)}`;
+    `;
+    
+    // Usar encodeURIComponent em vez de btoa
+    const encodedSvg = encodeURIComponent(svgContent);
+    e.target.src = `data:image/svg+xml,${encodedSvg}`;
   };
 
   return (

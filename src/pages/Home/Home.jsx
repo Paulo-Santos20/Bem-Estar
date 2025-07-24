@@ -10,9 +10,12 @@ const Home = () => {
     <div className="home">
       <Hero />
       
-      {/* Carrossel de Ofertas */}
-      <section className="offers-section">
-        <div className="container">
+      {/* Seção de Ofertas - Forçada para aparecer */}
+      <section 
+        className="offers-section"       
+      >
+        <div 
+          className="container">
           <OffersCarousel />
         </div>
       </section>

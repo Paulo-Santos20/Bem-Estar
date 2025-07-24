@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Button from '../../ui/Button/Button';
 import './Hero.css';
 
@@ -9,8 +9,8 @@ const Hero = () => {
   const autoPlayRef = useRef(null);
   const carouselRef = useRef(null);
 
-  // Dados dos slides do hero
-  const heroSlides = [
+  // Dados dos slides do hero (usando useMemo para performance)
+  const heroSlides = React.useMemo(() => [
     {
       id: 1,
       title: 'Sua Saúde é Nossa Prioridade',
@@ -116,18 +116,36 @@ const Hero = () => {
         { number: '15%', label: 'Desconto Primeira Compra' }
       ]
     }
-  ];
+  ], []);
 
   // Duplicar slides para carrossel infinito
-  const extendedSlides = [...heroSlides, ...heroSlides, ...heroSlides];
+  const extendedSlides = React.useMemo(() => [...heroSlides, ...heroSlides, ...heroSlides], [heroSlides]);
   const totalSlides = heroSlides.length;
 
-  // Auto-play
+  // Função para ir para próximo slide
+  const nextSlide = useCallback(() => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrentIndex(prev => prev + 1);
+  }, [isTransitioning]);
+
+  // Função para ir para slide anterior
+  const prevSlide = useCallback(() => {
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+    setCurrentIndex(prev => prev - 1);
+  }, [isTransitioning]);
+
+  // Auto-play (corrigido)
   useEffect(() => {
     if (isAutoPlaying) {
       autoPlayRef.current = setInterval(() => {
         nextSlide();
       }, 6000);
+    } else {
+      if (autoPlayRef.current) {
+        clearInterval(autoPlayRef.current);
+      }
     }
 
     return () => {
@@ -135,24 +153,12 @@ const Hero = () => {
         clearInterval(autoPlayRef.current);
       }
     };
-  }, [isAutoPlaying, currentIndex]);
-
-  // Função para ir para próximo slide
-  const nextSlide = () => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentIndex(prev => prev + 1);
-  };
-
-  // Função para ir para slide anterior
-  const prevSlide = () => {
-    if (isTransitioning) return;
-    setIsTransitioning(true);
-    setCurrentIndex(prev => prev - 1);
-  };
+  }, [isAutoPlaying, nextSlide]);
 
   // Reset infinito
   useEffect(() => {
+    if (!isTransitioning) return;
+
     const timer = setTimeout(() => {
       setIsTransitioning(false);
       
@@ -167,29 +173,26 @@ const Hero = () => {
     }, 800);
 
     return () => clearTimeout(timer);
-  }, [currentIndex, totalSlides]);
+  }, [currentIndex, totalSlides, isTransitioning]);
 
   // Pausar auto-play no hover
-  const handleMouseEnter = () => {
+  const handleMouseEnter = useCallback(() => {
     setIsAutoPlaying(false);
-    if (autoPlayRef.current) {
-      clearInterval(autoPlayRef.current);
-    }
-  };
+  }, []);
 
-  const handleMouseLeave = () => {
+  const handleMouseLeave = useCallback(() => {
     setIsAutoPlaying(true);
-  };
+  }, []);
 
   // Ir para slide específico
-  const goToSlide = (index) => {
+  const goToSlide = useCallback((index) => {
     if (isTransitioning) return;
     setIsTransitioning(true);
     setCurrentIndex(index);
-  };
+  }, [isTransitioning]);
 
   // Handlers para ações
-  const handleAction = (action) => {
+  const handleAction = useCallback((action) => {
     console.log('Ação:', action);
     // Implementar navegação baseada na ação
     switch (action) {
@@ -205,10 +208,10 @@ const Hero = () => {
       default:
         console.log('Ação não implementada:', action);
     }
-  };
+  }, []);
 
-  const handleImageError = (e) => {
-    e.target.src = `data:image/svg+xml;base64,${btoa(`
+  const handleImageError = useCallback((e) => {
+    const svgContent = `
       <svg width="1820" height="490" viewBox="0 0 1820 490" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
           <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
@@ -220,12 +223,13 @@ const Hero = () => {
         <circle cx="910" cy="245" r="80" fill="white" opacity="0.2"/>
         <path d="M870 225h80v40h-80v-40z" fill="white"/>
         <path d="M890 205h40v80h-40v-80z" fill="white"/>
-        <text x="910" y="320" text-anchor="middle" fill="white" font-size="24" font-weight="bold">Farmácia Bem Estar</text>
+        <text x="910" y="320" text-anchor="middle" fill="white" font-size="24" font-weight="bold">Farmacia Bem Estar</text>
       </svg>
-    `)}`;
-  };
-
-  const currentSlide = heroSlides[currentIndex % totalSlides];
+    `;
+    
+    const encodedSvg = encodeURIComponent(svgContent);
+    e.target.src = `data:image/svg+xml,${encodedSvg}`;
+  }, []);
 
   return (
     <section className="hero">

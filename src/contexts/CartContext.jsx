@@ -1,144 +1,150 @@
 import React, { createContext, useContext, useReducer, useEffect } from 'react';
 
-const CartContext = createContext();
+// Estado inicial do carrinho
+const initialState = {
+  items: [],
+  total: 0,
+  itemCount: 0
+};
 
-// Actions do carrinho
-const CART_ACTIONS = {
+// Ações do carrinho
+const cartActions = {
   ADD_ITEM: 'ADD_ITEM',
   REMOVE_ITEM: 'REMOVE_ITEM',
   UPDATE_QUANTITY: 'UPDATE_QUANTITY',
   CLEAR_CART: 'CLEAR_CART',
-  TOGGLE_CART: 'TOGGLE_CART'
+  LOAD_CART: 'LOAD_CART'
 };
 
 // Reducer do carrinho
 const cartReducer = (state, action) => {
   switch (action.type) {
-    case CART_ACTIONS.ADD_ITEM: {
-      const existingItem = state.items.find(item => item.id === action.payload.id);
-      
+    case cartActions.ADD_ITEM: {
+      const { product } = action.payload;
+      const existingItem = state.items.find(item => item.id === product.id);
+
+      let newItems;
       if (existingItem) {
-        return {
-          ...state,
-          items: state.items.map(item =>
-            item.id === action.payload.id
-              ? { ...item, quantity: item.quantity + (action.payload.quantity || 1) }
-              : item
-          )
-        };
-      }
-      
-      return {
-        ...state,
-        items: [...state.items, { ...action.payload, quantity: action.payload.quantity || 1 }]
-      };
-    }
-    
-    case CART_ACTIONS.REMOVE_ITEM:
-      return {
-        ...state,
-        items: state.items.filter(item => item.id !== action.payload)
-      };
-    
-    case CART_ACTIONS.UPDATE_QUANTITY: {
-      if (action.payload.quantity <= 0) {
-        return {
-          ...state,
-          items: state.items.filter(item => item.id !== action.payload.id)
-        };
-      }
-      
-      return {
-        ...state,
-        items: state.items.map(item =>
-          item.id === action.payload.id
-            ? { ...item, quantity: action.payload.quantity }
+        // Se o item já existe, aumenta a quantidade
+        newItems = state.items.map(item =>
+          item.id === product.id
+            ? { ...item, quantity: item.quantity + 1 }
             : item
-        )
+        );
+      } else {
+        // Se é um novo item, adiciona com quantidade 1
+        newItems = [...state.items, { ...product, quantity: 1 }];
+      }
+
+      const newTotal = newItems.reduce((sum, item) => sum + (item.offerPrice * item.quantity), 0);
+      const newItemCount = newItems.reduce((sum, item) => sum + item.quantity, 0);
+
+      return {
+        ...state,
+        items: newItems,
+        total: newTotal,
+        itemCount: newItemCount
       };
     }
-    
-    case CART_ACTIONS.CLEAR_CART:
+
+    case cartActions.REMOVE_ITEM: {
+      const { productId } = action.payload;
+      const newItems = state.items.filter(item => item.id !== productId);
+      const newTotal = newItems.reduce((sum, item) => sum + (item.offerPrice * item.quantity), 0);
+      const newItemCount = newItems.reduce((sum, item) => sum + item.quantity, 0);
+
       return {
         ...state,
-        items: []
+        items: newItems,
+        total: newTotal,
+        itemCount: newItemCount
       };
-    
-    case CART_ACTIONS.TOGGLE_CART:
+    }
+
+    case cartActions.UPDATE_QUANTITY: {
+      const { productId, quantity } = action.payload;
+      
+      if (quantity <= 0) {
+        return cartReducer(state, { 
+          type: cartActions.REMOVE_ITEM, 
+          payload: { productId } 
+        });
+      }
+
+      const newItems = state.items.map(item =>
+        item.id === productId ? { ...item, quantity } : item
+      );
+      const newTotal = newItems.reduce((sum, item) => sum + (item.offerPrice * item.quantity), 0);
+      const newItemCount = newItems.reduce((sum, item) => sum + item.quantity, 0);
+
       return {
         ...state,
-        isOpen: !state.isOpen
+        items: newItems,
+        total: newTotal,
+        itemCount: newItemCount
       };
-    
+    }
+
+    case cartActions.CLEAR_CART:
+      return initialState;
+
+    case cartActions.LOAD_CART:
+      return action.payload;
+
     default:
       return state;
   }
 };
 
-// Estado inicial
-const initialState = {
-  items: [],
-  isOpen: false
-};
+// Criar contexto
+const CartContext = createContext();
 
-// Provider do contexto
+// Provider do carrinho
 export const CartProvider = ({ children }) => {
   const [state, dispatch] = useReducer(cartReducer, initialState);
 
-  // Salvar no localStorage
+  // Carregar carrinho do localStorage na inicialização
   useEffect(() => {
-    localStorage.setItem('farmacia-cart', JSON.stringify(state.items));
-  }, [state.items]);
-
-  // Carregar do localStorage
-  useEffect(() => {
-    const savedCart = localStorage.getItem('farmacia-cart');
+    const savedCart = localStorage.getItem('bem-estar-cart');
     if (savedCart) {
       try {
-        const items = JSON.parse(savedCart);
-        items.forEach(item => {
-          dispatch({ type: CART_ACTIONS.ADD_ITEM, payload: item });
-        });
+        const parsedCart = JSON.parse(savedCart);
+        dispatch({ type: cartActions.LOAD_CART, payload: parsedCart });
       } catch (error) {
-        console.error('Erro ao carregar carrinho:', error);
+        console.error('Erro ao carregar carrinho do localStorage:', error);
       }
     }
   }, []);
 
-  // Funções auxiliares
-  const addItem = (product, quantity = 1) => {
+  // Salvar carrinho no localStorage sempre que mudar
+  useEffect(() => {
+    localStorage.setItem('bem-estar-cart', JSON.stringify(state));
+  }, [state]);
+
+  // Ações do carrinho
+  const addToCart = (product) => {
     dispatch({ 
-      type: CART_ACTIONS.ADD_ITEM, 
-      payload: { ...product, quantity } 
+      type: cartActions.ADD_ITEM, 
+      payload: { product } 
     });
   };
 
-  const removeItem = (productId) => {
-    dispatch({ type: CART_ACTIONS.REMOVE_ITEM, payload: productId });
+  const removeFromCart = (productId) => {
+    dispatch({ 
+      type: cartActions.REMOVE_ITEM, 
+      payload: { productId } 
+    });
   };
 
   const updateQuantity = (productId, quantity) => {
     dispatch({ 
-      type: CART_ACTIONS.UPDATE_QUANTITY, 
-      payload: { id: productId, quantity } 
+      type: cartActions.UPDATE_QUANTITY, 
+      payload: { productId, quantity } 
     });
   };
 
   const clearCart = () => {
-    dispatch({ type: CART_ACTIONS.CLEAR_CART });
-  };
-
-  const toggleCart = () => {
-    dispatch({ type: CART_ACTIONS.TOGGLE_CART });
-  };
-
-  // Cálculos
-  const getTotalItems = () => {
-    return state.items.reduce((total, item) => total + item.quantity, 0);
-  };
-
-  const getTotalPrice = () => {
-    return state.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+    dispatch({ type: cartActions.CLEAR_CART });
   };
 
   const getItemQuantity = (productId) => {
@@ -146,17 +152,33 @@ export const CartProvider = ({ children }) => {
     return item ? item.quantity : 0;
   };
 
+  const isInCart = (productId) => {
+    return state.items.some(item => item.id === productId);
+  };
+
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(price);
+  };
+
   const value = {
+    // Estado
     items: state.items,
-    isOpen: state.isOpen,
-    addItem,
-    removeItem,
+    total: state.total,
+    itemCount: state.itemCount,
+    
+    // Ações
+    addToCart,
+    removeFromCart,
     updateQuantity,
     clearCart,
-    toggleCart,
-    getTotalItems,
-    getTotalPrice,
-    getItemQuantity
+    
+    // Utilitários
+    getItemQuantity,
+    isInCart,
+    formatPrice
   };
 
   return (

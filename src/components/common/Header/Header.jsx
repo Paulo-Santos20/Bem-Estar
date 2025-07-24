@@ -1,251 +1,184 @@
-import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import Button from '../../ui/Button/Button';
-import SearchBar from '../../ui/SearchBar/SearchBar';
-import CategoryDropdown from '../../ui/CategoryDropdown/CategoryDropdown';
+import React, { useState } from 'react';
 import { useCart } from '../../../contexts/CartContext';
-import { categories, mainCategories, getCategoryById } from '../../../data/categories';
 import './Header.css';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isCategoriesOpen, setIsCategoriesOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-  const location = useLocation();
-  const { getTotalItems, toggleCart } = useCart();
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 50);
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  useEffect(() => {
-    setIsMenuOpen(false);
-    setIsCategoriesOpen(false);
-  }, [location]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
+  const { items, itemCount, total, formatPrice, removeFromCart, updateQuantity } = useCart();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
   };
 
-  const toggleCategories = () => {
-    setIsCategoriesOpen(!isCategoriesOpen);
+  const toggleCart = () => {
+    setIsCartOpen(!isCartOpen);
   };
 
-  const handleSearch = (searchTerm) => {
-    console.log('Buscando por:', searchTerm);
-    // Aqui você pode implementar a lógica de busca
-    // Por exemplo, redirecionar para uma página de resultados
-    // navigate(`/produtos?busca=${encodeURIComponent(searchTerm)}`);
+  const handleQuantityChange = (productId, newQuantity) => {
+    if (newQuantity <= 0) {
+      removeFromCart(productId);
+    } else {
+      updateQuantity(productId, newQuantity);
+    }
   };
-
-  const handleCategoryClick = (categoryId) => {
-    console.log('Navegando para categoria:', categoryId);
-    // Implementar navegação para categoria
-    // navigate(`/categoria/${categoryId}`);
-  };
-
-  const totalItems = getTotalItems();
-
-  // Obter as 4 categorias principais
-  const displayCategories = mainCategories.map(id => getCategoryById(id)).filter(Boolean);
 
   return (
-    <header className={`header ${isScrolled ? 'header--scrolled' : ''}`}>
-      {/* Parte Superior - Logo, Busca e Ações */}
-      <div className="header__top">
-        <div className="container">
-          <div className="header__top-content">
-            {/* Logo */}
-            <Link to="/" className="header__logo">
-              <div className="header__logo-icon">
-                <span className="header__logo-leaf">🍃</span>
-              </div>
-              <div className="header__logo-text">
-                <span className="header__logo-name">Bem Estar</span>
-                <span className="header__logo-subtitle">Farmácia</span>
-              </div>
-            </Link>
-
-            {/* Search Bar */}
-            <div className="header__search">
-              <SearchBar 
-                onSearch={handleSearch}
-                placeholder="Buscar medicamentos, produtos..."
-              />
+    <header className="header">
+      <div className="container">
+        <div className="header__content">
+          {/* Logo */}
+          <div className="header__logo">
+            <div className="header__logo-icon">
+              <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
+                <circle cx="20" cy="20" r="18" fill="#E53935"/>
+                <path d="M20 8c-3 0-5 2-5 5 0 2 1 4 3 5v8c0 1 1 2 2 2s2-1 2-2v-8c2-1 3-3 3-5 0-3-2-5-5-5z" fill="white"/>
+                <circle cx="20" cy="30" r="2" fill="white"/>
+              </svg>
             </div>
-
-            {/* Header Actions */}
-            <div className="header__actions">
-              <div className="header__contact">
-                <a href="tel:+5511999999999" className="header__contact-item">
-                  <span className="header__contact-icon">📞</span>
-                  <div className="header__contact-info">
-                    <span className="header__contact-label">Ligue grátis</span>
-                    <span className="header__contact-number">(11) 99999-9999</span>
-                  </div>
-                </a>
-              </div>
-
-              <div className="header__action-buttons">
-                <Button 
-                  variant="ghost" 
-                  size="md"
-                  icon={<span>❤️</span>}
-                  className="header__action-btn header__wishlist"
-                  title="Lista de Desejos"
-                >
-                  <div className="header__action-content">
-                    <span className="header__action-label">Meus</span>
-                    <span className="header__action-text">Favoritos</span>
-                  </div>
-                </Button>
-
-                <Button 
-                  variant="primary" 
-                  size="md"
-                  icon={<span>🛒</span>}
-                  className="header__action-btn header__cart"
-                  onClick={toggleCart}
-                  title="Abrir carrinho"
-                >
-                  <div className="header__action-content">
-                    <span className="header__action-label">Meu</span>
-                    <span className="header__action-text">Carrinho</span>
-                  </div>
-                  {totalItems > 0 && (
-                    <span className="header__cart-count">{totalItems}</span>
-                  )}
-                </Button>
-              </div>
-
-              {/* Mobile Menu Button */}
-              <button 
-                className={`header__menu-toggle ${isMenuOpen ? 'header__menu-toggle--active' : ''}`}
-                onClick={toggleMenu}
-                aria-label="Toggle menu"
-              >
-                <span></span>
-                <span></span>
-                <span></span>
-              </button>
+            <div className="header__logo-text">
+              <span className="header__logo-name">Bem Estar</span>
+              <span className="header__logo-tagline">Farmácia</span>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* Parte Inferior - Categorias */}
-      <div className="header__bottom">
-        <div className="container">
-          <div className="header__bottom-content">
-            {/* Todas as Categorias */}
-            <button 
-              className="header__all-categories"
-              onClick={toggleCategories}
-            >
-              <span className="header__all-categories-icon">☰</span>
-              <span className="header__all-categories-text">Todas as Categorias</span>
-              <span className="header__all-categories-arrow">▼</span>
+          {/* Navegação Desktop */}
+          <nav className="header__nav">
+            <ul className="header__nav-list">
+              <li><a href="#home" className="header__nav-link">Início</a></li>
+              <li><a href="#produtos" className="header__nav-link">Produtos</a></li>
+              <li><a href="#servicos" className="header__nav-link">Serviços</a></li>
+              <li><a href="#sobre" className="header__nav-link">Sobre</a></li>
+              <li><a href="#contato" className="header__nav-link">Contato</a></li>
+            </ul>
+          </nav>
+
+          {/* Ações do Header */}
+          <div className="header__actions">
+            {/* Busca */}
+            <div className="header__search">
+              <input 
+                type="text" 
+                placeholder="Buscar produtos..."
+                className="header__search-input"
+              />
+              <button className="header__search-button">
+                <span>🔍</span>
+              </button>
+            </div>
+
+            {/* Carrinho */}
+            <div className="header__cart">
+              <button 
+                className="header__cart-button"
+                onClick={toggleCart}
+              >
+                <span className="header__cart-icon">🛒</span>
+                {itemCount > 0 && (
+                  <span className="header__cart-count">{itemCount}</span>
+                )}
+              </button>
+
+              {/* Dropdown do Carrinho */}
+              {isCartOpen && (
+                <div className="header__cart-dropdown">
+                  <div className="header__cart-header">
+                    <h3>Meu Carrinho</h3>
+                    <button 
+                      className="header__cart-close"
+                      onClick={toggleCart}
+                    >
+                      ✕
+                    </button>
+                  </div>
+
+                  <div className="header__cart-items">
+                    {items.length === 0 ? (
+                      <p className="header__cart-empty">Seu carrinho está vazio</p>
+                    ) : (
+                      items.map(item => (
+                        <div key={item.id} className="header__cart-item">
+                          <img 
+                            src={item.image} 
+                            alt={item.title}
+                            className="header__cart-item-image"
+                          />
+                          <div className="header__cart-item-info">
+                            <h4 className="header__cart-item-title">{item.title}</h4>
+                            <p className="header__cart-item-price">
+                              {formatPrice(item.offerPrice)}
+                            </p>
+                            <div className="header__cart-item-quantity">
+                              <button 
+                                onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
+                                className="header__cart-quantity-btn"
+                              >
+                                -
+                              </button>
+                              <span>{item.quantity}</span>
+                              <button 
+                                onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
+                                className="header__cart-quantity-btn"
+                              >
+                                +
+                              </button>
+                            </div>
+                          </div>
+                          <button 
+                            onClick={() => removeFromCart(item.id)}
+                            className="header__cart-item-remove"
+                          >
+                            🗑️
+                          </button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {items.length > 0 && (
+                    <div className="header__cart-footer">
+                      <div className="header__cart-total">
+                        <strong>Total: {formatPrice(total)}</strong>
+                      </div>
+                      <button className="header__cart-checkout">
+                        Finalizar Compra
+                      </button>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Favoritos */}
+            <button className="header__favorites">
+              <span>♡</span>
             </button>
 
-            {/* Categorias Principais */}
-            <nav className="header__main-categories">
-              {displayCategories.map((category) => (
-                <button
-                  key={category.id}
-                  className="header__main-category"
-                  onClick={() => handleCategoryClick(category.id)}
-                >
-                  <span className="header__main-category-name">{category.name}</span>
-                </button>
-              ))}
-            </nav>
-          </div>
-        </div>
-      </div>
-
-      {/* Mobile Navigation */}
-      <nav className={`header__mobile-nav ${isMenuOpen ? 'header__mobile-nav--open' : ''}`}>
-        {/* Search Bar Mobile */}
-        <div className="header__mobile-search">
-          <SearchBar 
-            onSearch={handleSearch}
-            placeholder="Buscar produtos..."
-            className="header__mobile-search-bar"
-          />
-        </div>
-
-        {/* Categories Mobile */}
-        <div className="header__mobile-categories">
-          <button 
-            className="header__mobile-categories-toggle"
-            onClick={toggleCategories}
-          >
-            <span className="header__all-categories-icon">☰</span>
-            <span>Todas as Categorias</span>
-          </button>
-        </div>
-
-        {/* Quick Categories Mobile */}
-        <div className="header__mobile-quick-categories">
-          <h4>Categorias Principais</h4>
-          <div className="header__mobile-categories-grid">
-            {displayCategories.map((category) => (
-              <button
-                key={category.id}
-                className="header__mobile-category-item"
-                onClick={() => handleCategoryClick(category.id)}
-              >
-                <span className="header__mobile-category-name">{category.name}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        <div className="header__mobile-actions">
-          <a href="tel:+5511999999999" className="header__mobile-contact">
-            <span className="header__contact-icon">📞</span>
-            <span>(11) 99999-9999</span>
-          </a>
-          
-          <a href="https://wa.me/5511999999999" className="header__mobile-contact">
-            <span className="header__contact-icon">💬</span>
-            <span>WhatsApp</span>
-          </a>
-
-          <div className="header__mobile-buttons">
-            <Button variant="outline" size="sm" icon={<span>❤️</span>}>
-              Favoritos
-            </Button>
-            <Button 
-              variant="primary" 
-              size="sm" 
-              icon={<span>🛒</span>}
-              onClick={toggleCart}
+            {/* Menu Mobile */}
+            <button 
+              className="header__menu-toggle"
+              onClick={toggleMenu}
             >
-              Carrinho ({totalItems})
-            </Button>
+              <span></span>
+              <span></span>
+              <span></span>
+            </button>
           </div>
         </div>
-      </nav>
 
-      {/* Mobile Menu Overlay */}
-      {isMenuOpen && (
-        <div 
-          className="header__overlay" 
-          onClick={() => setIsMenuOpen(false)}
-        ></div>
-      )}
-
-      {/* Category Dropdown */}
-      <CategoryDropdown 
-        isOpen={isCategoriesOpen}
-        onClose={() => setIsCategoriesOpen(false)}
-      />
+        {/* Menu Mobile */}
+        {isMenuOpen && (
+          <nav className="header__mobile-nav">
+            <ul className="header__mobile-nav-list">
+              <li><a href="#home" onClick={toggleMenu}>Início</a></li>
+              <li><a href="#produtos" onClick={toggleMenu}>Produtos</a></li>
+              <li><a href="#servicos" onClick={toggleMenu}>Serviços</a></li>
+              <li><a href="#sobre" onClick={toggleMenu}>Sobre</a></li>
+              <li><a href="#contato" onClick={toggleMenu}>Contato</a></li>
+            </ul>
+          </nav>
+        )}
+      </div>
     </header>
   );
 };

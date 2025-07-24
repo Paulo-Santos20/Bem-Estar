@@ -11,7 +11,8 @@
 html {
   scroll-behavior: smooth;
   font-size: 16px;
-  overflow-x: hidden; 
+  overflow-x: hidden;
+  max-width: 100vw;
 }
 
 body {
@@ -22,7 +23,7 @@ body {
   background-color: var(--color-background);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden; /* Previne scroll horizontal */
+  overflow-x: hidden;
   width: 100%;
   max-width: 100vw;
 }
@@ -58,19 +59,82 @@ a:hover {
   color: var(--color-highlight-dark);
 }
 
-/* Utilitários */
+/* Container Global */
 .container {
+  width: 100%;
+  max-width: 1400px;
   margin: 0 auto;
   padding: 0 var(--spacing-md);
-  width: 100%;
+  box-sizing: border-box;
 }
 
+/* Seções Principais */
 .section {
   padding: var(--spacing-3xl) 0;
   width: 100%;
-  overflow: hidden;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
 }
 
+/* Isolamento de Componentes */
+.hero {
+  isolation: isolate;
+  position: relative;
+  z-index: 1;
+  max-width: 100vw;
+  overflow-x: hidden;
+  contain: layout style;
+}
+
+.offers-section {
+  width: 100%;
+  max-width: 100vw;
+  margin: 0 auto;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  padding: var(--spacing-2xl) 0;
+  background: var(--color-background);
+  isolation: isolate;
+  position: relative;
+  z-index: auto;
+  transform: translateZ(0);
+}
+
+.offers-section .container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.product-categories,
+.services-section,
+.testimonials {
+  width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  isolation: isolate;
+  position: relative;
+}
+
+/* Carrossel de Ofertas */
+.offers-carousel {
+  display: block;
+  visibility: visible;
+  opacity: 1;
+  width: 100%;
+  max-width: 100%;
+}
+
+/* Correção do Hero Track */
+.hero__track {
+  contain: layout style;
+  overflow: visible;
+  position: static;
+}
+
+/* Utilitários */
 .text-center { text-align: center; }
 .text-left { text-align: left; }
 .text-right { text-align: right; }
@@ -131,27 +195,4 @@ a:hover {
   .container {
     padding: 0 var(--spacing-sm);
   }
-}
-
-/* Seção de Ofertas */
-.offers-section {
-  padding: var(--spacing-2xl) 0;
-  background: var(--color-background);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.offers-section .container {
-  display: flex;
-  justify-content: center;
-  width: 100%;
-  max-width: 1400px;
-}
-
-/* Garantir que o carrossel seja visível */
-.offers-carousel {
-  display: block !important;
-  visibility: visible !important;
-  opacity: 1 !important;
 }
