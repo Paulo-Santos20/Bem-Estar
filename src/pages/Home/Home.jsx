@@ -1,16 +1,16 @@
 import React from 'react';
-import Hero from '../../components/features/Hero/Hero';
+import { Hero } from '../../components/features/Hero';
+import { ProductCategories } from '../../components/features/ProductCategories';
 import OffersCarousel from '../../components/features/OffersCarousel/OffersCarousel';
-import ProductCategories from '../../components/features/ProductCategories/ProductCategories';
-import ServicesSection from '../../components/features/ServicesSection/ServicesSection';
+import { FeaturedProducts } from '../../components/features/FeaturedProducts';
+import { ServicesSection } from '../../components/features/ServicesSection';
+import './Home.css';
 
-const Home = () => {
+export const Home = () => {
   return (
     <div className="home">
       <Hero />
-      
-      {/* Seção de Ofertas */}
-      <section 
+ <section 
         className="offers-section"       
       >
         <div 
@@ -18,8 +18,14 @@ const Home = () => {
           <OffersCarousel />
         </div>
       </section>
-
       <ProductCategories />
+      <FeaturedProducts 
+        title="Produtos em Destaque"
+        subtitle="Confira nossos produtos mais vendidos e novidades"
+        maxProducts={8}
+        showFilters={true}
+        showViewAll={true}
+      />
       <ServicesSection />
     </div>
   );

@@ -1,44 +1,82 @@
 import React from 'react';
-import { useCart } from '../../../contexts/CartContext';
-import Button from '../Button/Button';
+import { useNavigate } from 'react-router-dom';
 import './ProductCard.css';
 
-const ProductCard = ({ product }) => {
-  const { addItem, getItemQuantity } = useCart();
-  
-  const formatPrice = (price) => {
-    return new Intl.NumberFormat('pt-BR', {
-      style: 'currency',
-      currency: 'BRL'
-    }).format(price);
+export const ProductCard = ({ product }) => {
+  const navigate = useNavigate();
+
+  const handleProductClick = () => {
+    console.log('Redirecionando para a página do produto:', product.name);
+    navigate(`/produto/${product.id}`);
   };
 
-  const handleAddToCart = () => {
-    addItem(product);
+  const handleAddToCart = (e) => {
+    e.stopPropagation(); // Evita que o clique no botão acione o clique do card
+    console.log('Adicionando ao carrinho:', product.name);
+    // Lógica do carrinho aqui
   };
-
-  const quantity = getItemQuantity(product.id);
 
   return (
-    <div className="product-card">
-      <div className="product-card__image">
-        <img src={product.image || '/placeholder-product.jpg'} alt={product.name} />
-      </div>
-      
-      <div className="product-card__content">
-        <h3 className="product-card__name">{product.name}</h3>
-        <p className="product-card__description">{product.description}</p>
-        <div className="product-card__price">{formatPrice(product.price)}</div>
+    <div className="product-card" onClick={handleProductClick}>
+      <div className="product-card__image-container">
+        <img
+          src={product.images?.[0] || '/images/placeholder.jpg'}
+          alt={product.name}
+          className="product-card__image"
+        />
         
-        <Button 
-          variant="primary" 
-          size="sm"
+        {/* Badges */}
+        <div className="product-card__badges">
+          {product.isNew && (
+            <span className="product-card__badge product-card__badge--new">Novo</span>
+          )}
+          {product.originalPrice && product.originalPrice > product.price && (
+            <span className="product-card__badge product-card__badge--discount">
+              -{Math.round(((product.originalPrice - product.price) / product.originalPrice) * 100)}%
+            </span>
+          )}
+        </div>
+      </div>
+
+      <div className="product-card__content">
+        <h3 className="product-card__title">{product.name}</h3>
+        
+        <div className="product-card__rating">
+          <div className="product-card__stars">
+            {[...Array(5)].map((_, index) => (
+              <span
+                key={index}
+                className={`product-card__star ${
+                  index < Math.floor(product.rating || 0) ? 'product-card__star--filled' : ''
+                }`}
+              >
+                ★
+              </span>
+            ))}
+          </div>
+          <span className="product-card__rating-count">
+            ({product.reviewCount || 0})
+          </span>
+        </div>
+
+        <div className="product-card__pricing">
+          <span className="product-card__price">
+            R\$ {product.price.toFixed(2).replace('.', ',')}
+          </span>
+          {product.originalPrice && product.originalPrice > product.price && (
+            <span className="product-card__original-price">
+              R\$ {product.originalPrice.toFixed(2).replace('.', ',')}
+            </span>
+          )}
+        </div>
+
+        <button 
+          className="product-card__add-to-cart"
           onClick={handleAddToCart}
-          icon={<span>🛒</span>}
-          className="product-card__add-btn"
         >
-          {quantity > 0 ? `Adicionar mais (${quantity})` : 'Adicionar ao Carrinho'}
-        </Button>
+          <span className="icon">🛒</span>
+          Adicionar ao Carrinho
+        </button>
       </div>
     </div>
   );

@@ -930,40 +930,7 @@ const Header = () => {
                     ))}
                   </div>
 
-                  {/* Terceira Categoria - Aparece quando expandido */}
-                  {expandedSubcategory === index && subcat.thirdLevel && (
-                    <div className="header__mobile-third-level">
-                      <div className="header__mobile-third-level-header">
-                        <span className="header__mobile-third-level-icon">🔍</span>
-                        <span className="header__mobile-third-level-title">
-                          Produtos específicos em {subcat.title}
-                        </span>
-                      </div>
-
-                      <div className="header__mobile-third-level-content">
-                        {subcat.thirdLevel.map((thirdItem, thirdIndex) => (
-                          <div key={thirdIndex} className="header__mobile-third-item">
-                            <h6 className="header__mobile-third-item-title">
-                              <span className="header__mobile-third-item-icon">🏷️</span>
-                              {thirdItem.name}
-                            </h6>
-                            <div className="header__mobile-third-item-list">
-                              {thirdItem.items.map((finalItem, finalIndex) => (
-                                <a
-                                  key={finalIndex}
-                                  href={`#${finalItem.toLowerCase().replace(/\s+/g, '-')}`}
-                                  className="header__mobile-third-item-link"
-                                  onClick={toggleMobileMenu}
-                                >
-                                  {finalItem}
-                                </a>
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  
                 </div>
               ))}
 

@@ -1,0 +1,399 @@
+/* ========================================
+   🧭 BREADCRUMB NAVIGATION
+   ======================================== */
+
+.breadcrumb {
+  margin-bottom: var(--spacing-xl);
+  padding: var(--spacing-md) 0;
+  background: linear-gradient(135deg, rgba(248, 249, 250, 0.8), rgba(255, 255, 255, 0.9));
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(233, 236, 239, 0.6);
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  position: relative;
+  overflow: hidden;
+}
+
+.breadcrumb::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(229, 57, 53, 0.05), transparent);
+  transition: left var(--transition-normal);
+}
+
+.breadcrumb:hover::before {
+  left: 100%;
+}
+
+.breadcrumb__list {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin: 0;
+  padding: 0 var(--spacing-lg);
+  list-style: none;
+  position: relative;
+  z-index: 1;
+}
+
+/* ===== ITEM DO BREADCRUMB ===== */
+.breadcrumb__item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  position: relative;
+  transition: all var(--transition-fast);
+}
+
+.breadcrumb__item:not(.breadcrumb__item--active):hover {
+  transform: translateY(-1px);
+}
+
+/* ===== SEPARADOR ===== */
+.breadcrumb__separator {
+  color: var(--color-text-light);
+  font-weight: 600;
+  font-size: var(--font-size-base);
+  margin: 0 var(--spacing-sm);
+  opacity: 0.6;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.breadcrumb__item:hover + .breadcrumb__item .breadcrumb__separator,
+.breadcrumb__item:hover .breadcrumb__separator {
+  opacity: 1;
+  color: var(--color-primary);
+  transform: scale(1.1);
+}
+
+/* ===== LINK DO BREADCRUMB ===== */
+.breadcrumb__link {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  text-decoration: none;
+  color: var(--color-text-light);
+  font-weight: 500;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-normal);
+  position: relative;
+  overflow: hidden;
+  border: 1px solid transparent;
+}
+
+.breadcrumb__link::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(229, 57, 53, 0.1), rgba(229, 57, 53, 0.05));
+  opacity: 0;
+  transition: opacity var(--transition-fast);
+  border-radius: var(--border-radius-md);
+}
+
+.breadcrumb__link:hover {
+  color: var(--color-primary);
+  border-color: rgba(229, 57, 53, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(229, 57, 53, 0.15);
+}
+
+.breadcrumb__link:hover::before {
+  opacity: 1;
+}
+
+.breadcrumb__link:focus {
+  outline: 2px solid rgba(229, 57, 53, 0.4);
+  outline-offset: 2px;
+}
+
+/* ===== TEXTO ATIVO (PÁGINA ATUAL) ===== */
+.breadcrumb__text {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  color: var(--color-text);
+  font-weight: 700;
+  font-size: var(--font-size-sm);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  background: linear-gradient(135deg, var(--color-primary), #d32f2f);
+  color: var(--color-secondary);
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.breadcrumb__text::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left var(--transition-normal);
+}
+
+.breadcrumb__item--active .breadcrumb__text::before {
+  left: 100%;
+}
+
+/* ===== ÍCONES ===== */
+.breadcrumb__icon {
+  font-size: var(--font-size-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform var(--transition-fast);
+  flex-shrink: 0;
+}
+
+.breadcrumb__link:hover .breadcrumb__icon {
+  transform: scale(1.1) rotate(5deg);
+}
+
+.breadcrumb__item--active .breadcrumb__icon {
+  animation: breadcrumbIconPulse 2s ease-in-out infinite;
+}
+
+/* ===== LABEL ===== */
+.breadcrumb__label {
+  white-space: nowrap;
+  transition: all var(--transition-fast);
+  position: relative;
+  z-index: 1;
+}
+
+.breadcrumb__link:hover .breadcrumb__label {
+  font-weight: 600;
+}
+
+/* ===== ELLIPSIS (RETICÊNCIAS) ===== */
+.breadcrumb__item--ellipsis {
+  opacity: 0.7;
+}
+
+.breadcrumb__ellipsis {
+  color: var(--color-text-light);
+  font-weight: 600;
+  font-size: var(--font-size-lg);
+  padding: var(--spacing-xs) var(--spacing-sm);
+  cursor: help;
+  transition: all var(--transition-fast);
+  user-select: none;
+}
+
+.breadcrumb__ellipsis:hover {
+  color: var(--color-primary);
+  transform: scale(1.2);
+}
+
+/* ===== VARIAÇÕES DE ESTILO ===== */
+.breadcrumb--compact {
+  padding: var(--spacing-sm) 0;
+  margin-bottom: var(--spacing-md);
+}
+
+.breadcrumb--compact .breadcrumb__list {
+  padding: 0 var(--spacing-md);
+}
+
+.breadcrumb--compact .breadcrumb__link,
+.breadcrumb--compact .breadcrumb__text {
+  font-size: var(--font-size-xs);
+  padding: var(--spacing-xs);
+}
+
+.breadcrumb--minimal {
+  background: none;
+  border: none;
+  box-shadow: none;
+  padding: var(--spacing-xs) 0;
+}
+
+.breadcrumb--minimal .breadcrumb__list {
+  padding: 0;
+}
+
+.breadcrumb--dark {
+  background: linear-gradient(135deg, rgba(52, 58, 64, 0.9), rgba(33, 37, 41, 0.8));
+  border-color: rgba(108, 117, 125, 0.3);
+}
+
+.breadcrumb--dark .breadcrumb__link {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.breadcrumb--dark .breadcrumb__link:hover {
+  color: var(--color-secondary);
+}
+
+.breadcrumb--dark .breadcrumb__separator {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.breadcrumb--dark .breadcrumb__text {
+  background: linear-gradient(135deg, var(--color-highlight), #1976d2);
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 768px) {
+  .breadcrumb {
+    margin-bottom: var(--spacing-lg);
+    padding: var(--spacing-sm) 0;
+  }
+  
+  .breadcrumb__list {
+    padding: 0 var(--spacing-md);
+    gap: var(--spacing-xs);
+  }
+  
+  .breadcrumb__link,
+  .breadcrumb__text {
+    font-size: var(--font-size-xs);
+    padding: var(--spacing-xs);
+  }
+  
+  .breadcrumb__separator {
+    margin: 0 var(--spacing-xs);
+    font-size: var(--font-size-sm);
+  }
+  
+  .breadcrumb__icon {
+    font-size: var(--font-size-sm);
+  }
+  
+  /* Ocultar labels em telas muito pequenas, manter apenas ícones */
+  .breadcrumb__label {
+    display: none;
+  }
+  
+  .breadcrumb__icon {
+    margin: 0;
+  }
+  
+  /* Mostrar apenas o último item com label */
+  .breadcrumb__item--active .breadcrumb__label {
+    display: inline;
+  }
+}
+
+@media (max-width: 480px) {
+  .breadcrumb__list {
+    padding: 0 var(--spacing-sm);
+  }
+  
+  .breadcrumb__separator {
+    margin: 0 var(--spacing-xs);
+  }
+  
+  /* Mostrar apenas os 2 últimos itens em telas muito pequenas */
+  .breadcrumb__item:not(:nth-last-child(-n+2)) {
+    display: none;
+  }
+  
+  /* Adicionar ellipsis visual */
+  .breadcrumb__list::before {
+    content: '...';
+    color: var(--color-text-light);
+    font-weight: 600;
+    margin-right: var(--spacing-sm);
+  }
+}
+
+@media (max-width: 360px) {
+  .breadcrumb {
+    padding: var(--spacing-xs) 0;
+  }
+  
+  .breadcrumb__list {
+    padding: 0 var(--spacing-xs);
+  }
+  
+  /* Mostrar apenas o item atual em telas muito pequenas */
+  .breadcrumb__item:not(.breadcrumb__item--active) {
+    display: none;
+  }
+  
+  .breadcrumb__list::before {
+    content: '← ';
+    color: var(--color-primary);
+    font-weight: 700;
+  }
+}
+
+/* ===== ANIMAÇÕES ===== */
+@keyframes breadcrumbIconPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+/* ===== ACESSIBILIDADE ===== */
+@media (prefers-reduced-motion: reduce) {
+  .breadcrumb *,
+  .breadcrumb *::before,
+  .breadcrumb *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== PRINT STYLES ===== */
+@media print {
+  .breadcrumb {
+    background: none !important;
+    border: 1px solid #000 !important;
+    box-shadow: none !important;
+  }
+  
+  .breadcrumb__link,
+  .breadcrumb__text {
+    color: #000 !important;
+    background: none !important;
+  }
+  
+  .breadcrumb__separator {
+    color: #000 !important;
+  }
+}
+
+/* ===== ESTADOS DE FOCO PARA ACESSIBILIDADE ===== */
+.breadcrumb__link:focus-visible {
+  outline: 3px solid rgba(229, 57, 53, 0.6);
+  outline-offset: 2px;
+  border-radius: var(--border-radius-md);
+}
+
+/* ===== SUPORTE A MODO ESCURO ===== */
+@media (prefers-color-scheme: dark) {
+  .breadcrumb {
+    background: linear-gradient(135deg, rgba(33, 37, 41, 0.9), rgba(52, 58, 64, 0.8));
+    border-color: rgba(108, 117, 125, 0.3);
+  }
+  
+  .breadcrumb__link {
+    color: rgba(255, 255, 255, 0.7);
+  }
+  
+  .breadcrumb__link:hover {
+    color: var(--color-secondary);
+  }
+  
+  .breadcrumb__separator {
+    color: rgba(255, 255, 255, 0.5);
+  }
+}

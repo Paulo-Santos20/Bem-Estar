@@ -1,8 +1,10 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../../contexts/CartContext';
 import './OffersCarousel.css';
 
 const OffersCarousel = () => {
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isAutoPlaying, setIsAutoPlaying] = useState(true);
@@ -26,7 +28,9 @@ const OffersCarousel = () => {
       image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=280&h=200&fit=crop',
       category: 'Medicamentos',
       rating: 4.8,
-      slug: 'paracetamol-500mg'
+      slug: 'paracetamol-500mg',
+      stock: 50,
+      brand: 'Genérico'
     },
     {
       id: 2,
@@ -38,7 +42,9 @@ const OffersCarousel = () => {
       image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=280&h=200&fit=crop',
       category: 'Vitaminas',
       rating: 4.9,
-      slug: 'vitamina-c-1000mg'
+      slug: 'vitamina-c-1000mg',
+      stock: 30,
+      brand: 'VitaLife'
     },
     {
       id: 3,
@@ -50,7 +56,9 @@ const OffersCarousel = () => {
       image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=280&h=200&fit=crop',
       category: 'Beleza',
       rating: 4.7,
-      slug: 'protetor-solar-fps-60'
+      slug: 'protetor-solar-fps-60',
+      stock: 25,
+      brand: 'SunCare'
     },
     {
       id: 4,
@@ -62,7 +70,9 @@ const OffersCarousel = () => {
       image: 'https://images.unsplash.com/photo-1471864190281-a93a3070b6de?w=280&h=200&fit=crop',
       category: 'Medicamentos',
       rating: 4.6,
-      slug: 'dipirona-500mg'
+      slug: 'dipirona-500mg',
+      stock: 40,
+      brand: 'Medley'
     },
     {
       id: 5,
@@ -74,7 +84,9 @@ const OffersCarousel = () => {
       image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=280&h=200&fit=crop',
       category: 'Suplementos',
       rating: 4.8,
-      slug: 'omega-3-1000mg'
+      slug: 'omega-3-1000mg',
+      stock: 20,
+      brand: 'NutriMax'
     },
     {
       id: 6,
@@ -86,7 +98,9 @@ const OffersCarousel = () => {
       image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=280&h=200&fit=crop',
       category: 'Higiene',
       rating: 4.5,
-      slug: 'shampoo-anticaspa'
+      slug: 'shampoo-anticaspa',
+      stock: 35,
+      brand: 'Clear'
     },
     {
       id: 7,
@@ -98,7 +112,9 @@ const OffersCarousel = () => {
       image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=280&h=200&fit=crop',
       category: 'Vitaminas',
       rating: 4.7,
-      slug: 'multivitaminico'
+      slug: 'multivitaminico',
+      stock: 15,
+      brand: 'Centrum'
     },
     {
       id: 8,
@@ -110,7 +126,9 @@ const OffersCarousel = () => {
       image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=280&h=200&fit=crop',
       category: 'Beleza',
       rating: 4.9,
-      slug: 'hidratante-facial'
+      slug: 'hidratante-facial',
+      stock: 28,
+      brand: 'Nivea'
     }
   ], []);
 
@@ -187,16 +205,8 @@ const OffersCarousel = () => {
 
   // Navegar para página do produto
   const handleProductClick = useCallback((offer) => {
-    // Por enquanto, simular navegação com console.log
-    // Em uma aplicação real, você usaria React Router
-    console.log('Navegando para produto:', offer.slug);
-    
-    // Exemplo de como seria com React Router:
-    // navigate(`/produto/${offer.slug}`);
-    
-    // Por enquanto, mostrar um alert
-    alert(`Redirecionando para a página do produto: ${offer.title}`);
-  }, []);
+    navigate(`/produto/${offer.id}`);
+  }, [navigate]);
 
   // Criar notificação melhorada
   const createNotification = useCallback((offer, type = 'cart') => {
@@ -255,7 +265,18 @@ const OffersCarousel = () => {
   const handleAddToCart = useCallback((e, offer) => {
     e.stopPropagation(); // Prevenir navegação do card
     
-    addToCart(offer);
+    const cartItem = {
+      id: offer.id,
+      name: offer.title,
+      price: offer.offerPrice,
+      originalPrice: offer.originalPrice,
+      image: offer.image,
+      category: offer.category,
+      brand: offer.brand,
+      stock: offer.stock
+    };
+    
+    addToCart(cartItem);
     
     // Feedback visual com animação
     const button = document.querySelector(`[data-product-id="${offer.id}"]`);
@@ -308,7 +329,7 @@ const OffersCarousel = () => {
     }).format(price);
   }, []);
 
-  // Renderizar estrelas de avaliação (apenas estrelas)
+  // Renderizar estrelas de avaliação
   const renderStars = useCallback((rating) => {
     const stars = [];
     const fullStars = Math.floor(rating);
@@ -334,9 +355,17 @@ const OffersCarousel = () => {
 
   return (
     <div className="offers-carousel">
-      {/* Título simplificado */}
+      {/* Cabeçalho */}
       <div className="offers-carousel__header">
-        <h2 className="offers-carousel__title">As Melhores Ofertas da Semana</h2>
+        <div className="offers-carousel__title-container">
+          <h2 className="offers-carousel__title">
+            <span className="offers-carousel__title-icon">🔥</span>
+            As Melhores Ofertas da Semana
+          </h2>
+          <p className="offers-carousel__subtitle">
+            Produtos selecionados com descontos imperdíveis
+          </p>
+        </div>
         
         {totalItems > itemsPerView && (
           <div className="offers-carousel__controls">
@@ -360,6 +389,7 @@ const OffersCarousel = () => {
         )}
       </div>
 
+      {/* Container do Carousel */}
       <div 
         className="offers-carousel__container"
         onMouseEnter={handleMouseEnter}
@@ -387,7 +417,7 @@ const OffersCarousel = () => {
                 }}
                 aria-label={`Ver detalhes do produto ${offer.title}`}
               >
-                {/* Desconto no topo */}
+                {/* Badge de Desconto */}
                 <div className="offer-card__discount">
                   <span className="offer-card__discount-text">{offer.discount}% OFF</span>
                 </div>
@@ -401,6 +431,7 @@ const OffersCarousel = () => {
                   </div>
                 )}
 
+                {/* Imagem do Produto */}
                 <div className="offer-card__image-container">
                   <img 
                     src={offer.image} 
@@ -415,12 +446,13 @@ const OffersCarousel = () => {
                   </div>
                 </div>
 
+                {/* Conteúdo do Card */}
                 <div className="offer-card__content">
                   <div className="offer-card__category">{offer.category}</div>
                   <h3 className="offer-card__title">{offer.title}</h3>
                   <p className="offer-card__description">{offer.description}</p>
                   
-                  {/* Apenas estrelas, sem texto de avaliações */}
+                  {/* Avaliação */}
                   <div className="offer-card__rating">
                     <div className="offer-card__stars">
                       {renderStars(offer.rating)}
@@ -428,6 +460,7 @@ const OffersCarousel = () => {
                     <span className="offer-card__rating-value">({offer.rating})</span>
                   </div>
                   
+                  {/* Preços e Ações */}
                   <div className="offer-card__pricing-section">
                     <div className="offer-card__pricing">
                       <span className="offer-card__original-price">
@@ -436,6 +469,10 @@ const OffersCarousel = () => {
                       <span className="offer-card__offer-price">
                         Por: {formatPrice(offer.offerPrice)}
                       </span>
+                    </div>
+
+                    <div className="offer-card__savings">
+                      Economize {formatPrice(offer.originalPrice - offer.offerPrice)}
                     </div>
 
                     <div className="offer-card__actions">
@@ -448,8 +485,12 @@ const OffersCarousel = () => {
                         aria-label="Adicionar ao carrinho"
                         title="Adicionar ao carrinho"
                       >
-                        🛒
+                        <span className="offer-card__cart-icon">🛒</span>
+                        <span className="offer-card__cart-text">
+                          {isInCart(offer.id) ? 'No Carrinho' : 'Adicionar'}
+                        </span>
                       </button>
+                      
                       <button 
                         className={`offer-card__wishlist-button ${
                           isInWishlist(offer.id) ? 'offer-card__wishlist-button--active' : ''
@@ -467,6 +508,16 @@ const OffersCarousel = () => {
               </div>
             </div>
           ))}
+        </div>
+      </div>
+
+     
+
+      {/* Timer de Ofertas */}
+      <div className="offers-carousel__timer">
+        <div className="offers-carousel__timer-icon">⏰</div>
+        <div className="offers-carousel__timer-text">
+          Ofertas por tempo limitado! Aproveite agora!
         </div>
       </div>
     </div>

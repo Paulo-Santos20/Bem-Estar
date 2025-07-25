@@ -1,0 +1,57 @@
+/* ========================================
+   📦 PÁGINA DO PRODUTO
+   ======================================== */
+
+.product-page {
+  padding: var(--spacing-xl) 0;
+  background: linear-gradient(135deg, var(--color-secondary), #fafbfc);
+  min-height: calc(100vh - 200px);
+}
+
+.product-main {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--spacing-3xl);
+  margin-bottom: var(--spacing-3xl);
+  background: var(--color-secondary);
+  border-radius: var(--border-radius-2xl);
+  padding: var(--spacing-2xl);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  border: 1px solid #f0f0f0;
+}
+
+.product-main__gallery {
+  position: relative;
+}
+
+.product-main__info {
+  position: relative;
+}
+
+/* ===== RESPONSIVIDADE ===== */
+@media (max-width: 1024px) {
+  .product-main {
+    gap: var(--spacing-2xl);
+    padding: var(--spacing-xl);
+  }
+}
+
+@media (max-width: 768px) {
+  .product-page {
+    padding: var(--spacing-lg) 0;
+  }
+  
+  .product-main {
+    grid-template-columns: 1fr;
+    gap: var(--spacing-xl);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-2xl);
+  }
+}
+
+@media (max-width: 480px) {
+  .product-main {
+    padding: var(--spacing-md);
+    border-radius: var(--border-radius-lg);
+  }
+}
