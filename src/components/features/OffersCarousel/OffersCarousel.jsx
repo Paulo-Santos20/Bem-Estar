@@ -510,9 +510,6 @@ const OffersCarousel = () => {
           ))}
         </div>
       </div>
-
-     
-
       {/* Timer de Ofertas */}
       <div className="offers-carousel__timer">
         <div className="offers-carousel__timer-icon">⏰</div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 import './Footer.css';
 
 const Footer = () => {
@@ -8,12 +9,10 @@ const Footer = () => {
   const handleNewsletterSubmit = (e) => {
     e.preventDefault();
     if (newsletterEmail.trim()) {
-      // Aqui você pode integrar com sua API de newsletter
       console.log('Newsletter subscription:', newsletterEmail);
       setIsNewsletterSubmitted(true);
       setNewsletterEmail('');
       
-      // Reset feedback após 3 segundos
       setTimeout(() => {
         setIsNewsletterSubmitted(false);
       }, 3000);
@@ -31,29 +30,25 @@ const Footer = () => {
             
             {/* Coluna 1 - Informações da Empresa */}
             <div className="footer__column footer__column--company">
-              <div className="footer__logo">
+              <Link to="/" className="footer__logo">
                 <div className="footer__logo-icon">
-                  <span className="footer__logo-symbol">🍃</span>
+                  <span className="footer__logo-symbol">❤️</span>
                 </div>
                 <div className="footer__logo-text">
                   <h3 className="footer__logo-name">Bem Estar</h3>
                   <p className="footer__logo-tagline">Farmácia</p>
                 </div>
-              </div>
+              </Link>
               
               <p className="footer__description">
-                Há mais de 15 anos cuidando da sua saúde e bem-estar com produtos de qualidade, 
-                atendimento especializado e preços justos. Sua farmácia de confiança.
+                Cuidando da sua saúde e bem-estar com produtos de qualidade 
+                e atendimento especializado.
               </p>
               
               <div className="footer__certifications">
                 <div className="footer__cert-item">
                   <span className="footer__cert-icon">🏥</span>
                   <span className="footer__cert-text">CRF Licenciada</span>
-                </div>
-                <div className="footer__cert-item">
-                  <span className="footer__cert-icon">✅</span>
-                  <span className="footer__cert-text">ANVISA Certificada</span>
                 </div>
                 <div className="footer__cert-item">
                   <span className="footer__cert-icon">🔒</span>
@@ -69,72 +64,45 @@ const Footer = () => {
                 Links Rápidos
               </h4>
               <ul className="footer__links-list">
-                <li><a href="#sobre" className="footer__link">Sobre Nós</a></li>
-                <li><a href="#produtos" className="footer__link">Produtos</a></li>
-                <li><a href="#servicos" className="footer__link">Serviços</a></li>
-                <li><a href="#blog" className="footer__link">Blog de Saúde</a></li>
-                <li><a href="#promocoes" className="footer__link">Promoções</a></li>
-                <li><a href="#receitas" className="footer__link">Enviar Receita</a></li>
-                <li><a href="#contato" className="footer__link">Contato</a></li>
-                <li><a href="#trabalhe-conosco" className="footer__link">Trabalhe Conosco</a></li>
+                <li><Link to="/produtos" className="footer__link">Produtos</Link></li>
+                <li><Link to="/produtos?category=Medicamentos" className="footer__link">Medicamentos</Link></li>
+                <li><Link to="/produtos?category=Vitaminas" className="footer__link">Vitaminas</Link></li>
+                <li><Link to="/produtos?category=Beleza" className="footer__link">Beleza</Link></li>
+                <li><Link to="/produtos?availability=on-sale" className="footer__link">Ofertas</Link></li>
+                <li><Link to="/contato" className="footer__link">Contato</Link></li>
               </ul>
             </div>
 
-            {/* Coluna 3 - Categorias */}
-            <div className="footer__column footer__column--categories">
-              <h4 className="footer__column-title">
-                <span className="footer__title-icon">🏷️</span>
-                Categorias
-              </h4>
-              <ul className="footer__links-list">
-                <li><a href="#medicamentos" className="footer__link">Medicamentos</a></li>
-                <li><a href="#vitaminas" className="footer__link">Vitaminas</a></li>
-                <li><a href="#beleza" className="footer__link">Beleza e Cuidados</a></li>
-                <li><a href="#higiene" className="footer__link">Higiene Pessoal</a></li>
-                <li><a href="#suplementos" className="footer__link">Suplementos</a></li>
-                <li><a href="#infantil" className="footer__link">Produtos Infantis</a></li>
-                <li><a href="#dermocosmeticos" className="footer__link">Dermocosméticos</a></li>
-                <li><a href="#equipamentos" className="footer__link">Equipamentos</a></li>
-              </ul>
-            </div>
-
-            {/* Coluna 4 - Atendimento */}
+            {/* Coluna 3 - Contato */}
             <div className="footer__column footer__column--contact">
               <h4 className="footer__column-title">
                 <span className="footer__title-icon">📞</span>
-                Atendimento
+                Contato
               </h4>
               
               <div className="footer__contact-info">
                 <div className="footer__contact-item">
                   <span className="footer__contact-icon">📍</span>
                   <div className="footer__contact-details">
-                    <strong>Endereço:</strong>
-                    <p>Rua das Flores, 123<br />Centro - São Paulo/SP<br />CEP: 01234-567</p>
+                    <p>Rua das Flores, 123<br />Centro - São Paulo/SP</p>
                   </div>
                 </div>
                 
                 <div className="footer__contact-item">
                   <span className="footer__contact-icon">📞</span>
                   <div className="footer__contact-details">
-                    <strong>Telefone:</strong>
-                    <p>(11) 3456-7890</p>
-                  </div>
-                </div>
-                
-                <div className="footer__contact-item">
-                  <span className="footer__contact-icon">📱</span>
-                  <div className="footer__contact-details">
-                    <strong>WhatsApp:</strong>
-                    <p>(11) 99876-5432</p>
+                    <a href="tel:+5511999999999" className="footer__contact-link">
+                      (11) 99999-9999
+                    </a>
                   </div>
                 </div>
                 
                 <div className="footer__contact-item">
                   <span className="footer__contact-icon">✉️</span>
                   <div className="footer__contact-details">
-                    <strong>E-mail:</strong>
-                    <p>contato@farmaciabemestar.com.br</p>
+                    <a href="mailto:contato@bemestar.com" className="footer__contact-link">
+                      contato@bemestar.com
+                    </a>
                   </div>
                 </div>
               </div>
@@ -142,26 +110,22 @@ const Footer = () => {
               <div className="footer__hours">
                 <h5 className="footer__hours-title">
                   <span className="footer__hours-icon">🕒</span>
-                  Horário de Funcionamento
+                  Funcionamento
                 </h5>
                 <div className="footer__hours-list">
                   <div className="footer__hours-item">
-                    <span>Segunda a Sexta:</span>
-                    <span>7h às 22h</span>
+                    <span>Seg - Sex:</span>
+                    <span>8h às 22h</span>
                   </div>
                   <div className="footer__hours-item">
-                    <span>Sábados:</span>
+                    <span>Sáb - Dom:</span>
                     <span>8h às 20h</span>
-                  </div>
-                  <div className="footer__hours-item">
-                    <span>Domingos e Feriados:</span>
-                    <span>9h às 18h</span>
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Coluna 5 - Newsletter */}
+            {/* Coluna 4 - Newsletter e Redes Sociais */}
             <div className="footer__column footer__column--newsletter">
               <h4 className="footer__column-title">
                 <span className="footer__title-icon">📧</span>
@@ -169,7 +133,7 @@ const Footer = () => {
               </h4>
               
               <p className="footer__newsletter-description">
-                Receba ofertas exclusivas, dicas de saúde e novidades diretamente no seu e-mail.
+                Receba ofertas exclusivas e dicas de saúde.
               </p>
               
               <form className="footer__newsletter-form" onSubmit={handleNewsletterSubmit}>
@@ -177,7 +141,7 @@ const Footer = () => {
                   <input
                     type="email"
                     className="footer__newsletter-input"
-                    placeholder="Seu melhor e-mail"
+                    placeholder="Seu e-mail"
                     value={newsletterEmail}
                     onChange={(e) => setNewsletterEmail(e.target.value)}
                     required
@@ -192,61 +156,42 @@ const Footer = () => {
                 </div>
                 {isNewsletterSubmitted && (
                   <div className="footer__newsletter-success">
-                    ✅ Inscrição realizada com sucesso!
+                    ✅ Inscrito com sucesso!
                   </div>
                 )}
               </form>
               
               <div className="footer__social-media">
-                <h5 className="footer__social-title">Siga-nos:</h5>
+                <h5 className="footer__social-title">Redes Sociais:</h5>
                 <div className="footer__social-links">
-                  <a href="#facebook" className="footer__social-link footer__social-link--facebook">
+                  <a 
+                    href="https://facebook.com" 
+                     
+                    rel="noopener noreferrer"
+                    className="footer__social-link footer__social-link--facebook"
+                    title="Facebook"
+                  >
                     <span className="footer__social-icon">📘</span>
-                    <span className="footer__social-name">Facebook</span>
                   </a>
-                  <a href="#instagram" className="footer__social-link footer__social-link--instagram">
+                  <a 
+                    href="https://instagram.com" 
+                     
+                    rel="noopener noreferrer"
+                    className="footer__social-link footer__social-link--instagram"
+                    title="Instagram"
+                  >
                     <span className="footer__social-icon">📷</span>
-                    <span className="footer__social-name">Instagram</span>
                   </a>
-                  <a href="#whatsapp" className="footer__social-link footer__social-link--whatsapp">
+                  <a 
+                    href="https://wa.me/5511999999999" 
+                     
+                    rel="noopener noreferrer"
+                    className="footer__social-link footer__social-link--whatsapp"
+                    title="WhatsApp"
+                  >
                     <span className="footer__social-icon">💬</span>
-                    <span className="footer__social-name">WhatsApp</span>
-                  </a>
-                  <a href="#youtube" className="footer__social-link footer__social-link--youtube">
-                    <span className="footer__social-icon">📺</span>
-                    <span className="footer__social-name">YouTube</span>
                   </a>
                 </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Seção de Informações Legais */}
-      <div className="footer__legal">
-        <div className="container">
-          <div className="footer__legal-content">
-            <div className="footer__legal-links">
-              <a href="#politica-privacidade" className="footer__legal-link">Política de Privacidade</a>
-              <span className="footer__legal-separator">|</span>
-              <a href="#termos-uso" className="footer__legal-link">Termos de Uso</a>
-              <span className="footer__legal-separator">|</span>
-              <a href="#politica-cookies" className="footer__legal-link">Política de Cookies</a>
-              <span className="footer__legal-separator">|</span>
-              <a href="#trocas-devolucoes" className="footer__legal-link">Trocas e Devoluções</a>
-              <span className="footer__legal-separator">|</span>
-              <a href="#fale-conosco" className="footer__legal-link">Fale Conosco</a>
-            </div>
-            
-            <div className="footer__payment-methods">
-              <span className="footer__payment-title">Formas de Pagamento:</span>
-              <div className="footer__payment-icons">
-                <span className="footer__payment-icon" title="Cartão de Crédito">💳</span>
-                <span className="footer__payment-icon" title="Cartão de Débito">💳</span>
-                <span className="footer__payment-icon" title="PIX">🔲</span>
-                <span className="footer__payment-icon" title="Boleto">📄</span>
-                <span className="footer__payment-icon" title="Dinheiro">💰</span>
               </div>
             </div>
           </div>
@@ -259,19 +204,21 @@ const Footer = () => {
           <div className="footer__copyright-content">
             <div className="footer__copyright-text">
               <p>
-                © {currentYear} Farmácia Bem Estar. Todos os direitos reservados. 
-                <span className="footer__cnpj">CNPJ: 12.345.678/0001-90</span>
+                © {currentYear} Farmácia Bem Estar. Todos os direitos reservados.
               </p>
               <p className="footer__disclaimer">
-                As informações contidas neste site não devem ser usadas para automedicação. 
-                Consulte sempre um farmacêutico ou médico.
+                Consulte sempre um farmacêutico ou médico antes de usar medicamentos.
               </p>
             </div>
             
-            <div className="footer__developer">
-              <span className="footer__developer-text">
-                Desenvolvido com <span className="footer__heart">❤️</span> para sua saúde
-              </span>
+            <div className="footer__payment-methods">
+              <span className="footer__payment-title">Pagamento:</span>
+              <div className="footer__payment-icons">
+                <span className="footer__payment-icon" title="Cartão">💳</span>
+                <span className="footer__payment-icon" title="PIX">🔲</span>
+                <span className="footer__payment-icon" title="Boleto">📄</span>
+                <span className="footer__payment-icon" title="Dinheiro">💰</span>
+              </div>
             </div>
           </div>
         </div>
@@ -284,7 +231,6 @@ const Footer = () => {
         title="Voltar ao topo"
       >
         <span className="footer__back-to-top-icon">⬆️</span>
-        <span className="footer__back-to-top-text">Topo</span>
       </button>
     </footer>
   );

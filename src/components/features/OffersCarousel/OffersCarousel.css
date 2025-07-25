@@ -1,5 +1,5 @@
 /* ========================================
-   🔥 OFFERS CAROUSEL
+   🔥 OFFERS CAROUSEL - VERSÃO LIMPA
    ======================================== */
 
 .offers-carousel {
@@ -8,7 +8,9 @@
   border-radius: var(--border-radius-2xl);
   margin-bottom: var(--spacing-2xl);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  z-index: 1;
+  isolation: isolate;
 }
 
 .offers-carousel::before {
@@ -20,9 +22,10 @@
   height: 100%;
   background: linear-gradient(45deg, transparent 40%, rgba(255, 193, 7, 0.1) 50%, transparent 60%);
   animation: shimmerEffect 6s ease-in-out infinite;
+  z-index: -1;
 }
 
-/* ===== CABEÇALHO ===== */
+/* Cabeçalho */
 .offers-carousel__header {
   display: flex;
   justify-content: space-between;
@@ -30,7 +33,7 @@
   margin-bottom: var(--spacing-2xl);
   padding: 0 var(--spacing-lg);
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .offers-carousel__title-container {
@@ -65,10 +68,12 @@
   font-weight: 500;
 }
 
-/* ===== CONTROLES ===== */
+/* Controles */
 .offers-carousel__controls {
   display: flex;
   gap: var(--spacing-sm);
+  z-index: 5;
+  position: relative;
 }
 
 .offers-carousel__control {
@@ -86,6 +91,7 @@
   box-shadow: 0 4px 15px rgba(229, 57, 53, 0.3);
   position: relative;
   overflow: hidden;
+  z-index: 5;
 }
 
 .offers-carousel__control::before {
@@ -119,25 +125,47 @@
   line-height: 1;
 }
 
-/* ===== CONTAINER DO CAROUSEL ===== */
+/* Container e Track - CORRIGIDO */
 .offers-carousel__container {
   position: relative;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: visible;
   padding: 0 var(--spacing-lg);
+  z-index: 1;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
 }
 
 .offers-carousel__track {
   display: flex;
-  will-change: transform;
+  position: relative;
+  z-index: 1;
+  isolation: isolate;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition: transform var(--transition-normal);
 }
 
 .offers-carousel__item {
-  flex: 0 0 25%; /* 4 itens por padrão */
+  flex: 0 0 25%;
   padding: 0 var(--spacing-sm);
   box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+  min-width: 0;
+  transform: translateZ(0);
 }
 
-/* ===== CARD DA OFERTA ===== */
+/* Animações controladas */
+.offers-carousel__track--animating {
+  will-change: transform;
+}
+
+.offers-carousel__track--idle {
+  will-change: auto;
+}
+
+/* Card da Oferta */
 .offer-card {
   background: linear-gradient(135deg, var(--color-secondary), #fafbfc);
   border-radius: var(--border-radius-xl);
@@ -149,6 +177,7 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  z-index: 2;
 }
 
 .offer-card--clickable {
@@ -159,14 +188,15 @@
   transform: translateY(-8px);
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
   border-color: var(--color-primary);
+  z-index: 3;
 }
 
-/* ===== BADGE DE DESCONTO ===== */
+/* Badges */
 .offer-card__discount {
   position: absolute;
   top: var(--spacing-sm);
   left: var(--spacing-sm);
-  z-index: 10;
+  z-index: 5;
 }
 
 .offer-card__discount-text {
@@ -182,12 +212,11 @@
   animation: badgeFloat 2s ease-in-out infinite;
 }
 
-/* ===== BADGE DO CARRINHO ===== */
 .offer-card__cart-badge {
   position: absolute;
   top: var(--spacing-sm);
   right: var(--spacing-sm);
-  z-index: 10;
+  z-index: 5;
 }
 
 .offer-card__cart-badge-text {
@@ -200,13 +229,14 @@
   box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
 }
 
-/* ===== IMAGEM ===== */
+/* Imagem */
 .offer-card__image-container {
   position: relative;
   width: 100%;
   height: 180px;
   overflow: hidden;
   background: linear-gradient(135deg, #f8f9fa, #ffffff);
+  z-index: 1;
 }
 
 .offer-card__image {
@@ -230,6 +260,7 @@
   opacity: 0;
   transition: all var(--transition-normal);
   backdrop-filter: blur(5px);
+  z-index: 2;
 }
 
 .offer-card:hover .offer-card__image-overlay {
@@ -253,12 +284,14 @@
   transform: translateY(0);
 }
 
-/* ===== CONTEÚDO ===== */
+/* Conteúdo */
 .offer-card__content {
   padding: var(--spacing-lg);
   flex: 1;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 1;
 }
 
 .offer-card__category {
@@ -294,7 +327,7 @@
   overflow: hidden;
 }
 
-/* ===== AVALIAÇÃO ===== */
+/* Avaliação */
 .offer-card__rating {
   display: flex;
   align-items: center;
@@ -331,7 +364,7 @@
   font-weight: 500;
 }
 
-/* ===== PREÇOS ===== */
+/* Preços */
 .offer-card__pricing-section {
   margin-top: auto;
 }
@@ -362,7 +395,7 @@
   margin-bottom: var(--spacing-md);
 }
 
-/* ===== AÇÕES ===== */
+/* Ações */
 .offer-card__actions {
   display: flex;
   gap: var(--spacing-sm);
@@ -385,6 +418,7 @@
   font-size: var(--font-size-sm);
   position: relative;
   overflow: hidden;
+  z-index: 3;
 }
 
 .offer-card__cart-button::before {
@@ -439,6 +473,8 @@
   align-items: center;
   justify-content: center;
   font-size: var(--font-size-lg);
+  position: relative;
+  z-index: 3;
 }
 
 .offer-card__wishlist-button:hover {
@@ -457,9 +493,7 @@
   animation: buttonPulse 0.6s ease-in-out;
 }
 
-/* ===== INDICADORES ===== */
-
-
+/* Indicadores */
 .offers-carousel__indicator {
   width: 12px;
   height: 12px;
@@ -468,6 +502,8 @@
   border-radius: 50%;
   cursor: pointer;
   transition: all var(--transition-fast);
+  position: relative;
+  z-index: 5;
 }
 
 .offers-carousel__indicator:hover {
@@ -480,9 +516,7 @@
   transform: scale(1.3);
 }
 
-/* ===== TIMER ===== */
-
-
+/* Timer */
 .offers-carousel__timer-icon {
   font-size: var(--font-size-lg);
   animation: timerPulse 1s ease-in-out infinite;
@@ -496,7 +530,7 @@
   letter-spacing: 0.5px;
 }
 
-/* ===== NOTIFICAÇÃO DO CARRINHO ===== */
+/* Notificação do Carrinho */
 .cart-notification {
   position: fixed;
   top: 20px;
@@ -505,7 +539,7 @@
   border-radius: var(--border-radius-lg);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   border: 2px solid var(--color-primary);
-  z-index: 10000;
+  z-index: 9999;
   transform: translateX(400px);
   transition: transform var(--transition-normal);
   max-width: 350px;
@@ -589,22 +623,25 @@
   color: var(--color-text-light);
 }
 
-/* ===== RESPONSIVIDADE ===== */
+/* Responsividade */
 @media (max-width: 1199px) {
   .offers-carousel__item {
-    flex: 0 0 33.333%; /* 3 itens */
+    flex: 0 0 33.333%;
   }
 }
 
 @media (max-width: 991px) {
   .offers-carousel__item {
-    flex: 0 0 50%; /* 2 itens */
+    flex: 0 0 50%;
   }
 }
 
 @media (max-width: 767px) {
   .offers-carousel {
     padding: var(--spacing-xl) 0;
+    position: relative;
+    z-index: 1;
+    overflow: visible;
   }
   
   .offers-carousel__header {
@@ -612,6 +649,8 @@
     align-items: flex-start;
     gap: var(--spacing-lg);
     padding: 0 var(--spacing-md);
+    position: relative;
+    z-index: 2;
   }
   
   .offers-carousel__title {
@@ -622,23 +661,38 @@
   
   .offers-carousel__container {
     padding: 0 var(--spacing-md);
+    overflow-x: auto;
+    overflow-y: visible;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .offers-carousel__track {
+    z-index: 1 !important;
+    will-change: auto !important;
   }
   
   .offers-carousel__item {
-    flex: 0 0 100%; /* 1 item */
+    flex: 0 0 100%;
+    z-index: 1 !important;
   }
   
   .offer-card__content {
     padding: var(--spacing-md);
   }
   
-  
-  
   .cart-notification {
     top: 10px;
     right: 10px;
     left: 10px;
     max-width: none;
+    z-index: 9999;
+  }
+  
+  /* Garante que carousel não interfira com header */
+  .offers-carousel,
+  .offers-carousel *:not(.offers-carousel__control):not(.cart-notification) {
+    z-index: 1 !important;
   }
 }
 
@@ -663,7 +717,23 @@
   }
 }
 
-/* ===== ANIMAÇÕES ===== */
+/* Fallback para navegadores antigos */
+@supports not (will-change: transform) {
+  .offers-carousel__track {
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+/* Correção para Safari */
+@media screen and (-webkit-min-device-pixel-ratio: 0) {
+  .offers-carousel__track {
+    -webkit-transform: translateZ(0);
+    -webkit-backface-visibility: hidden;
+    -webkit-perspective: 1000;
+  }
+}
+
+/* Animações */
 @keyframes shimmerEffect {
   0% { transform: translateX(-100%); }
   100% { transform: translateX(100%); }
@@ -690,7 +760,7 @@
   50% { transform: scale(1.2); }
 }
 
-/* ===== ACESSIBILIDADE ===== */
+/* Acessibilidade */
 @media (prefers-reduced-motion: reduce) {
   .offers-carousel *,
   .offers-carousel *::before,
@@ -701,10 +771,9 @@
   }
 }
 
-/* ===== PRINT STYLES ===== */
+/* Print styles */
 @media print {
   .offers-carousel__controls,
-  
   .offers-carousel__timer,
   .cart-notification {
     display: none !important;

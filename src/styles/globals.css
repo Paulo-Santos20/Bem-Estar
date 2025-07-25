@@ -68,16 +68,18 @@ a:hover {
   box-sizing: border-box;
 }
 
-/* Seções Principais */
+/* Seções Principais - SEM INTERFERÊNCIA NO HEADER */
 .section {
   padding: var(--spacing-3xl) 0;
   width: 100%;
   max-width: 100vw;
   box-sizing: border-box;
   overflow-x: hidden;
+  position: relative;
+  z-index: 1;
 }
 
-/* Isolamento de Componentes */
+/* Isolamento de Componentes - Z-INDEX BAIXO */
 .hero {
   isolation: isolate;
   position: relative;
@@ -87,26 +89,31 @@ a:hover {
   contain: layout style;
 }
 
+/* OFFERS SECTION - CORRIGIDA PARA NÃO INTERFERIR */
 .offers-section {
   width: 100%;
-  max-width: 100vw;
   margin: 0 auto;
   box-sizing: border-box;
-  overflow-x: hidden;
+  overflow: visible !important; /* MUDANÇA CRÍTICA */
   padding: var(--spacing-2xl) 0;
   background: var(--color-background);
   isolation: isolate;
-  position: relative;
-  z-index: auto;
-  transform: translateZ(0);
+  position: static !important; /* MUDANÇA CRÍTICA */
+  z-index: auto !important; /* MUDANÇA CRÍTICA */
+  transform: none !important; /* MUDANÇA CRÍTICA */
 }
 
 .offers-section .container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: block; /* MUDANÇA: era flex */
+  width: 100%;
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+  overflow: visible !important; /* MUDANÇA CRÍTICA */
+  position: static !important; /* MUDANÇA CRÍTICA */
 }
 
+/* Outras seções com z-index baixo */
 .product-categories,
 .services-section,
 .testimonials {
@@ -116,15 +123,19 @@ a:hover {
   overflow-x: hidden;
   isolation: isolate;
   position: relative;
+  z-index: 1; /* Z-index baixo */
 }
 
-/* Carrossel de Ofertas */
+/* Carrossel de Ofertas - SEM INTERFERÊNCIA */
 .offers-carousel {
   display: block;
   visibility: visible;
   opacity: 1;
   width: 100%;
   max-width: 100%;
+  position: static !important; /* MUDANÇA CRÍTICA */
+  z-index: auto !important; /* MUDANÇA CRÍTICA */
+  overflow: visible !important; /* MUDANÇA CRÍTICA */
 }
 
 /* Correção do Hero Track */
@@ -132,6 +143,82 @@ a:hover {
   contain: layout style;
   overflow: visible;
   position: static;
+  z-index: 1;
+}
+
+/* PROTEÇÃO ESPECÍFICA PARA O HEADER MOBILE */
+@media (max-width: 768px) {
+  /* Garante que nenhuma seção interfira com o header */
+  .section,
+  .hero,
+  .offers-section,
+  .product-categories,
+  .services-section,
+  .testimonials {
+    position: relative !important;
+    z-index: 1 !important;
+    overflow-x: hidden !important;
+    overflow-y: visible !important;
+  }
+  
+  /* Força a offers-section a não interferir */
+  .offers-section {
+    position: static !important;
+    z-index: auto !important;
+    transform: none !important;
+    will-change: auto !important;
+    contain: none !important;
+    isolation: auto !important;
+  }
+  
+  .offers-section .container {
+    position: static !important;
+    z-index: auto !important;
+    transform: none !important;
+    overflow: visible !important;
+    display: block !important;
+  }
+  
+  .offers-carousel {
+    position: static !important;
+    z-index: auto !important;
+    transform: none !important;
+    will-change: auto !important;
+    contain: none !important;
+    isolation: auto !important;
+    overflow: visible !important;
+  }
+  
+  /* Garante que o header mobile tenha prioridade */
+  .header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    isolation: isolate !important;
+  }
+  
+  .header__mobile {
+    position: relative !important;
+    z-index: 1001 !important;
+    isolation: isolate !important;
+  }
+  
+  .header__mobile-cart {
+    position: relative !important;
+    z-index: 1005 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  .header__mobile-cart-button {
+    position: relative !important;
+    z-index: 1006 !important;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
 }
 
 /* Utilitários */
@@ -195,4 +282,60 @@ a:hover {
   .container {
     padding: 0 var(--spacing-sm);
   }
+}
+
+/* REGRAS DE EMERGÊNCIA PARA PREVENIR CONFLITOS */
+/* Remove qualquer propriedade que possa interferir com o header */
+.offers-section *:not(.header):not(.header *) {
+  z-index: auto !important;
+}
+
+/* Exceção apenas para elementos que precisam aparecer acima do conteúdo normal */
+.offers-carousel__controls,
+.offers-carousel__control,
+.offers-carousel__indicators,
+.offers-carousel__indicator,
+.cart-notification {
+  z-index: 10 !important;
+}
+
+/* Mas nunca acima do header */
+@media (max-width: 768px) {
+  .offers-carousel__controls,
+  .offers-carousel__control,
+  .offers-carousel__indicators,
+  .offers-carousel__indicator {
+    z-index: 10 !important;
+  }
+  
+  .cart-notification {
+    z-index: 9999 !important;
+  }
+  
+  /* Header sempre no topo */
+  .header,
+  .header *,
+  .header__mobile,
+  .header__mobile *,
+  .header__mobile-cart,
+  .header__mobile-cart * {
+    z-index: 1000 !important;
+  }
+}
+
+/* Previne que transforms criem contextos de empilhamento problemáticos */
+.offers-section,
+.offers-carousel {
+  transform: none !important;
+  will-change: auto !important;
+  contain: none !important;
+  isolation: auto !important;
+}
+
+/* Garante que o layout seja estável */
+.offers-section .container {
+  display: block !important;
+  position: static !important;
+  transform: none !important;
+  will-change: auto !important;
 }

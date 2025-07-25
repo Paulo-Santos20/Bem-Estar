@@ -367,6 +367,20 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
 }
 
+.home .header__mobile-cart {
+  display: block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  z-index: 1005 !important;
+}
+
+.home .header__mobile-cart-button {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  z-index: 1006 !important;
+}
 .product-card__badge--new {
   background: linear-gradient(135deg, #28a745, #20c997);
   color: var(--color-secondary);
