@@ -4,6 +4,7 @@
 /* --- SEÇÃO DE NOVOS PRODUTOS --- */
 .product-carousel-section {
   background: linear-gradient(135deg, rgba(33, 150, 243, 0.02), rgba(33, 150, 243, 0.05));
+  padding: var(--spacing-3xl) 0;
   position: relative;
   overflow: hidden;
 }
@@ -591,7 +592,7 @@
   letter-spacing: 0.2px;
 }
 
-/* ---- RESPONSIVIDADE ---- */
+/* ---- RESPONSIVIDADE CORRIGIDA ---- */
 
 @media (max-width: 1199px) {
   .carousel-new-products-item {
@@ -622,13 +623,18 @@
   }
 }
 
+/* MOBILE - CORRIGIDO PARA EVITAR LISTRA PRETA */
 @media (max-width: 767px) {
   .product-carousel-section {
     padding: var(--spacing-2xl) 0;
+    /* REMOVIDO overflow: hidden que pode causar problemas */
   }
   
   .container {
     padding: 0 var(--spacing-md);
+    /* GARANTIR QUE NÃO ULTRAPASSE A LARGURA */
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .product-carousel-header {
@@ -644,16 +650,25 @@
   .carousel-new-products-outer {
     margin: var(--spacing-xl) 0;
     padding: 0 45px;
+    /* GARANTIR QUE NÃO ULTRAPASSE */
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
   .carousel-new-products-list {
     gap: var(--spacing-md);
+    /* GARANTIR QUE NÃO ULTRAPASSE */
+    max-width: 100%;
+    box-sizing: border-box;
   }
   
+  /* MANTENDO 2 ITENS NO MOBILE - CORRIGIDO */
   .carousel-new-products-item {
     flex: 0 0 calc(50% - var(--spacing-sm));
     min-width: calc(50% - var(--spacing-sm));
     max-width: calc(50% - var(--spacing-sm));
+    /* GARANTIR QUE NÃO ULTRAPASSE */
+    box-sizing: border-box;
   }
   
   .carousel-arrow-new {
@@ -686,9 +701,26 @@
   }
 }
 
+/* MOBILE PEQUENO - CORRIGIDO PARA EVITAR OVERFLOW */
 @media (max-width: 480px) {
+  .container {
+    padding: 0 var(--spacing-sm); /* REDUZIDO AINDA MAIS */
+  }
+  
+  .carousel-new-products-outer {
+    padding: 0 35px; /* REDUZIDO */
+    margin: var(--spacing-lg) 0;
+  }
+  
   .carousel-new-products-list {
     gap: var(--spacing-sm);
+  }
+  
+  .carousel-new-products-item {
+    /* GARANTIR QUE CAIBA EM TELAS MUITO PEQUENAS */
+    flex: 0 0 calc(50% - var(--spacing-xs));
+    min-width: calc(50% - var(--spacing-xs));
+    max-width: calc(50% - var(--spacing-xs));
   }
   
   .product-carousel-content {
@@ -698,10 +730,6 @@
   .carousel-arrow-new {
     width: 36px;
     height: 36px;
-  }
-  
-  .carousel-new-products-outer {
-    padding: 0 40px;
   }
   
   .product-carousel-name {
@@ -719,6 +747,23 @@
   
   .product-carousel-cart-emoji {
     font-size: 0.9rem;
+  }
+}
+
+/* TELAS MUITO PEQUENAS - PREVENÇÃO EXTRA */
+@media (max-width: 360px) {
+  .container {
+    padding: 0 var(--spacing-xs);
+  }
+  
+  .carousel-new-products-outer {
+    padding: 0 30px;
+  }
+  
+  .carousel-new-products-item {
+    flex: 0 0 calc(50% - 4px);
+    min-width: calc(50% - 4px);
+    max-width: calc(50% - 4px);
   }
 }
 
