@@ -9,7 +9,10 @@
   margin-bottom: var(--spacing-2xl);
   position: relative;
   overflow: visible;
-  z-index: 1;
+  /* FIX CRUCIAL: Aumentar o z-index para que o carrossel apareça acima do conteúdo normal.
+     Este valor (50) é maior que o z-index padrão da maioria dos elementos,
+     mas menor que o z-index dos elementos interativos do cabeçalho (que são 1000+). */
+  z-index: 50; 
   isolation: isolate;
 }
 
@@ -33,7 +36,7 @@
   margin-bottom: var(--spacing-2xl);
   padding: 0 var(--spacing-lg);
   position: relative;
-  z-index: 2;
+  z-index: 2; /* Z-index relativo ao .offers-carousel (50) */
 }
 
 .offers-carousel__title-container {
@@ -72,7 +75,7 @@
 .offers-carousel__controls {
   display: flex;
   gap: var(--spacing-sm);
-  z-index: 5;
+  z-index: 5; /* Z-index relativo ao .offers-carousel (50) */
   position: relative;
 }
 
@@ -91,7 +94,7 @@
   box-shadow: 0 4px 15px rgba(229, 57, 53, 0.3);
   position: relative;
   overflow: hidden;
-  z-index: 5;
+  z-index: 5; /* Z-index relativo ao .offers-carousel (50) */
 }
 
 .offers-carousel__control::before {
@@ -125,13 +128,13 @@
   line-height: 1;
 }
 
-/* Container e Track - CORRIGIDO */
+/* Container e Track */
 .offers-carousel__container {
   position: relative;
   overflow-x: auto;
   overflow-y: visible;
   padding: 0 var(--spacing-lg);
-  z-index: 1;
+  z-index: 1; /* Z-index relativo ao .offers-carousel (50) */
   scroll-behavior: smooth;
   -webkit-overflow-scrolling: touch;
 }
@@ -139,7 +142,7 @@
 .offers-carousel__track {
   display: flex;
   position: relative;
-  z-index: 1;
+  z-index: 1; /* Z-index relativo ao .offers-carousel__container (que está dentro do .offers-carousel) */
   isolation: isolate;
   transform: translateZ(0);
   backface-visibility: hidden;
@@ -151,7 +154,7 @@
   padding: 0 var(--spacing-sm);
   box-sizing: border-box;
   position: relative;
-  z-index: 1;
+  z-index: 1; /* Z-index relativo ao .offers-carousel__track */
   min-width: 0;
   transform: translateZ(0);
 }
@@ -177,7 +180,7 @@
   display: flex;
   flex-direction: column;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-  z-index: 2;
+  z-index: 2; /* Z-index relativo ao .offers-carousel__item */
 }
 
 .offer-card--clickable {
@@ -188,7 +191,7 @@
   transform: translateY(-8px);
   box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
   border-color: var(--color-primary);
-  z-index: 3;
+  z-index: 3; /* Z-index relativo ao .offers-carousel__item (elevado no hover para destaque) */
 }
 
 /* Badges */
@@ -196,7 +199,7 @@
   position: absolute;
   top: var(--spacing-sm);
   left: var(--spacing-sm);
-  z-index: 5;
+  z-index: 5; /* Z-index relativo ao .offer-card */
 }
 
 .offer-card__discount-text {
@@ -216,7 +219,7 @@
   position: absolute;
   top: var(--spacing-sm);
   right: var(--spacing-sm);
-  z-index: 5;
+  z-index: 5; /* Z-index relativo ao .offer-card */
 }
 
 .offer-card__cart-badge-text {
@@ -236,7 +239,7 @@
   height: 180px;
   overflow: hidden;
   background: linear-gradient(135deg, #f8f9fa, #ffffff);
-  z-index: 1;
+  z-index: 1; /* Z-index relativo ao .offer-card */
 }
 
 .offer-card__image {
@@ -260,7 +263,7 @@
   opacity: 0;
   transition: all var(--transition-normal);
   backdrop-filter: blur(5px);
-  z-index: 2;
+  z-index: 2; /* Z-index relativo ao .offer-card__image-container */
 }
 
 .offer-card:hover .offer-card__image-overlay {
@@ -291,7 +294,7 @@
   display: flex;
   flex-direction: column;
   position: relative;
-  z-index: 1;
+  z-index: 1; /* Z-index relativo ao .offer-card */
 }
 
 .offer-card__category {
@@ -418,7 +421,7 @@
   font-size: var(--font-size-sm);
   position: relative;
   overflow: hidden;
-  z-index: 3;
+  z-index: 3; /* Z-index relativo ao .offer-card */
 }
 
 .offer-card__cart-button::before {
@@ -474,7 +477,7 @@
   justify-content: center;
   font-size: var(--font-size-lg);
   position: relative;
-  z-index: 3;
+  z-index: 3; /* Z-index relativo ao .offer-card */
 }
 
 .offer-card__wishlist-button:hover {
@@ -503,7 +506,7 @@
   cursor: pointer;
   transition: all var(--transition-fast);
   position: relative;
-  z-index: 5;
+  z-index: 5; /* Z-index relativo ao .offers-carousel */
 }
 
 .offers-carousel__indicator:hover {
@@ -539,7 +542,8 @@
   border-radius: var(--border-radius-lg);
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   border: 2px solid var(--color-primary);
-  z-index: 9999;
+  /* Deve ser muito alto para sempre aparecer acima de tudo, inclusive o cabeçalho */
+  z-index: 9999; 
   transform: translateX(400px);
   transition: transform var(--transition-normal);
   max-width: 350px;
@@ -640,8 +644,9 @@
   .offers-carousel {
     padding: var(--spacing-xl) 0;
     position: relative;
-    z-index: 1;
     overflow: visible;
+    /* Manter o z-index aumentado para dispositivos móveis também */
+    z-index: 50; 
   }
   
   .offers-carousel__header {
@@ -650,7 +655,7 @@
     gap: var(--spacing-lg);
     padding: 0 var(--spacing-md);
     position: relative;
-    z-index: 2;
+    z-index: 2; /* Relativo ao .offers-carousel */
   }
   
   .offers-carousel__title {
@@ -664,17 +669,17 @@
     overflow-x: auto;
     overflow-y: visible;
     position: relative;
-    z-index: 2;
+    z-index: 1; /* Relativo ao .offers-carousel */
   }
   
   .offers-carousel__track {
-    z-index: 1 !important;
+    /* REMOVIDO OU COMENTADO: z-index: 1 !important; */
     will-change: auto !important;
   }
   
   .offers-carousel__item {
     flex: 0 0 100%;
-    z-index: 1 !important;
+    /* REMOVIDO OU COMENTADO: z-index: 1 !important; */
   }
   
   .offer-card__content {
@@ -686,14 +691,13 @@
     right: 10px;
     left: 10px;
     max-width: none;
+    /* Z-index 9999 para garantir que a notificação esteja sempre por cima */
     z-index: 9999;
   }
   
-  /* Garante que carousel não interfira com header */
-  .offers-carousel,
-  .offers-carousel *:not(.offers-carousel__control):not(.cart-notification) {
-    z-index: 1 !important;
-  }
+  /* REVISADO: Removido o seletor que forçava z-index: 1 !important */
+  /* era: .offers-carousel, .offers-carousel *:not(.offers-carousel__control):not(.cart-notification) { z-index: 1 !important; } */
+  /* Esta regra estava causando o problema e foi removida na correção global do .offers-carousel */
 }
 
 @media (max-width: 480px) {

@@ -11,7 +11,11 @@ const Header = () => {
   // Estados para navegação mobile hierárquica
   const [mobileMenuView, setMobileMenuView] = useState('main'); // 'main' ou 'subcategory'
   const [selectedMobileCategory, setSelectedMobileCategory] = useState(null);
-  const [expandedSubcategory, setExpandedSubcategory] = useState(null); // Para terceira categoria
+  // Renomeado para maior clareza: controla a expansão da "segunda camada" (Dor e Febre)
+  const [expandedSecondLevelIndex, setExpandedSecondLevelIndex] = useState(null);
+  // Novo estado: controla a expansão da "terceira camada" (Paracetamol dentro de Dor e Febre)
+  const [expandedThirdLevelGroupIndex, setExpandedThirdLevelGroupIndex] = useState(null);
+
 
   const { items, itemCount, total, formatPrice, removeFromCart, updateQuantity } = useCart();
 
@@ -29,30 +33,44 @@ const Header = () => {
     if (isMobileMenuOpen) {
       setMobileMenuView('main');
       setSelectedMobileCategory(null);
-      setExpandedSubcategory(null);
+      setExpandedSecondLevelIndex(null); // Reset da segunda camada
+      setExpandedThirdLevelGroupIndex(null); // Reset da terceira camada
     }
   };
 
-  // Navegar para subcategorias no mobile
+  // Navegar para subcategorias no mobile (ex: Medicamentos -> Dor e Febre)
   const handleMobileCategoryClick = (categoryKey) => {
     setSelectedMobileCategory(categoryKey);
     setMobileMenuView('subcategory');
-    setExpandedSubcategory(null); // Reset subcategoria expandida
+    setExpandedSecondLevelIndex(null); // Reset ao mudar de categoria principal
+    setExpandedThirdLevelGroupIndex(null); // Reset ao mudar de categoria principal
   };
 
   // Voltar para categorias principais no mobile
   const handleMobileBackToMain = () => {
     setMobileMenuView('main');
     setSelectedMobileCategory(null);
-    setExpandedSubcategory(null);
+    setExpandedSecondLevelIndex(null);
+    setExpandedThirdLevelGroupIndex(null);
   };
 
-  // Toggle terceira categoria (expandir/colapsar)
-  const handleSubcategoryClick = (subcategoryIndex) => {
-    if (expandedSubcategory === subcategoryIndex) {
-      setExpandedSubcategory(null); // Colapsar se já estiver expandido
+  // Toggle da segunda camada (ex: Dor e Febre)
+  const handleSecondLevelClick = (index) => {
+    if (expandedSecondLevelIndex === index) {
+      setExpandedSecondLevelIndex(null);
+      setExpandedThirdLevelGroupIndex(null); // Colapsa a terceira camada junto
     } else {
-      setExpandedSubcategory(subcategoryIndex); // Expandir nova subcategoria
+      setExpandedSecondLevelIndex(index);
+      setExpandedThirdLevelGroupIndex(null); // Reseta a terceira camada ao abrir nova segunda camada
+    }
+  };
+
+  // Toggle da terceira camada (ex: Paracetamol)
+  const handleThirdLevelGroupClick = (thirdLvlIndex) => {
+    if (expandedThirdLevelGroupIndex === thirdLvlIndex) {
+      setExpandedThirdLevelGroupIndex(null);
+    } else {
+      setExpandedThirdLevelGroupIndex(thirdLvlIndex);
     }
   };
 
@@ -81,7 +99,7 @@ const Header = () => {
       subcategories: [
         {
           title: 'Dor e Febre',
-          items: ['Paracetamol', 'Ibuprofeno', 'Aspirina', 'Dipirona', 'Nimesulida'],
+          items: ['Paracetamol', 'Ibuprofeno', 'Aspirina', 'Dipirona', 'Nimesulida'], // 'items' pode ser redundante, usaremos thirdLevel.name
           thirdLevel: [
             { name: 'Paracetamol', items: ['500mg', '750mg', 'Gotas', 'Xarope'] },
             { name: 'Ibuprofeno', items: ['400mg', '600mg', 'Gel', 'Suspensão'] },
@@ -223,7 +241,7 @@ const Header = () => {
           thirdLevel: [
             { name: 'FPS 30', items: ['Loção', 'Spray', 'Bastão', 'Gel'] },
             { name: 'FPS 60', items: ['Facial', 'Corporal', 'Sport', 'Resistente'] },
-            { name: 'Infantil', items: ['Bebê', 'Criança', 'Hipoalergênico', 'Natural'] },
+            { name: 'Infantil', items: ['Bebê', 'Criança', 'Hipoalérgico', 'Natural'] },
             { name: 'Facial', items: ['Base', 'Mousse', 'Fluido', 'Toque Seco'] },
             { name: 'Corporal', items: ['Loção', 'Óleo', 'Spray', 'Bastão'] }
           ]
@@ -423,7 +441,7 @@ const Header = () => {
 
   return (
     <header className="header">
-      {/* ===== LAYOUT DESKTOP (mantido igual) ===== */}
+      {/* ===== LAYOUT DESKTOP ===== */}
       <div className="header__desktop">
         {/* SEÇÃO SUPERIOR */}
         <div className="header__top">
@@ -446,14 +464,16 @@ const Header = () => {
 
               {/* Busca Central */}
               <div className="header__search">
-                <input
-                  type="text"
-                  placeholder="Busque por medicamentos, vitaminas, beleza..."
-                  className="header__search-input"
-                />
-                <button className="header__search-button">
-                  <span>🔍</span>
-                </button>
+                <form className="header__search-form" onSubmit={(e) => e.preventDefault()}>
+                  <input
+                    type="text"
+                    placeholder="Busque por medicamentos, vitaminas, beleza..."
+                    className="header__search-input"
+                  />
+                  <button type="submit" className="header__search-button">
+                    <span>🔍</span>
+                  </button>
+                </form>
               </div>
 
               {/* Ações do Header */}
@@ -477,7 +497,7 @@ const Header = () => {
                     )}
                   </button>
 
-                  {/* Dropdown do Carrinho (mantido igual) */}
+                  {/* Dropdown do Carrinho */}
                   {isCartOpen && (
                     <div className="header__cart-dropdown">
                       <div className="header__cart-header">
@@ -555,7 +575,7 @@ const Header = () => {
           </div>
         </div>
 
-        {/* SEÇÃO INFERIOR - NAVEGAÇÃO (mantida igual) */}
+        {/* SEÇÃO INFERIOR - NAVEGAÇÃO */}
         <div className="header__bottom">
           <div className="container">
             <div className="header__nav">
@@ -572,12 +592,10 @@ const Header = () => {
                   <span className="header__categories-arrow">▼</span>
                 </button>
 
-                {/* Dropdown de Categorias - LAYOUT 3 COLUNAS (mantido igual) */}
+                {/* Dropdown de Categorias - LAYOUT 3 COLUNAS */}
                 {isCategoriesOpen && (
                   <div className="header__categories-dropdown">
                     <div className="header__categories-content">
-
-
                       {/* COLUNA 1 - CATEGORIAS PRINCIPAIS */}
                       <div className="header__categories-main">
                         {Object.keys(categoriesData).map((categoryKey) => (
@@ -598,24 +616,32 @@ const Header = () => {
                         ))}
                       </div>
 
-                      {/* COLUNA 2 - SUBCATEGORIAS */}
-                      <div className="header__subcategories">
-                        <h3 className="header__subcategories-title">
+                      {/* COLUNA 2 - SUBCATEGORIAS & TERCEIRO NÍVEL */}
+                      <div className="header__subcategories-wrapper">
+                        <h3 className="header__subcategories-area-title">
                           {currentCategory.title}
                         </h3>
-                        <div className="header__subcategories-list">
+                        <div className="header__subcategories-grid">
                           {currentCategory.subcategories.map((subcat, index) => (
-                            <div key={index} className="header__subcategory-group">
-                              <h4 className="header__subcategory-title">{subcat.title}</h4>
-                              <ul className="header__subcategory-items">
-                                {subcat.items.map((item, itemIndex) => (
-                                  <li key={itemIndex}>
-                                    <a
-                                      href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
-                                      className="header__subcategory-link"
-                                    >
-                                      {item}
-                                    </a>
+                            <div key={index} className="header__subcategory-group-expanded">
+                              <h4 className="header__subcategory-group-title-expanded">
+                                {subcat.title}
+                              </h4>
+                              <ul className="header__third-level-list">
+                                {subcat.thirdLevel && subcat.thirdLevel.map((thirdLvlGroup, thirdLvlIndex) => (
+                                  <li key={thirdLvlIndex} className="header__third-level-group">
+                                    <span className="header__third-level-group-name">{thirdLvlGroup.name}:</span>
+                                    <div className="header__third-level-items">
+                                      {thirdLvlGroup.items.map((item, itemIndex) => (
+                                        <a
+                                          key={itemIndex}
+                                          href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
+                                          className="header__third-level-link"
+                                        >
+                                          {item}
+                                        </a>
+                                      ))}
+                                    </div>
                                   </li>
                                 ))}
                               </ul>
@@ -654,7 +680,6 @@ const Header = () => {
                           ))}
                         </div>
                       </div>
-
                     </div>
                   </div>
                 )}
@@ -730,7 +755,7 @@ const Header = () => {
                   )}
                 </button>
 
-                {/* Dropdown do Carrinho Mobile (mantido igual) */}
+                {/* Dropdown do Carrinho Mobile */}
                 {isCartOpen && (
                   <div className="header__cart-dropdown">
                     <div className="header__cart-header">
@@ -811,14 +836,16 @@ const Header = () => {
         <div className="header__mobile-search">
           <div className="container">
             <div className="header__mobile-search-container">
-              <input
-                type="text"
-                placeholder="Busque por medicamentos, vitaminas..."
-                className="header__mobile-search-input"
-              />
-              <button className="header__mobile-search-button">
-                <span>🔍</span>
-              </button>
+              <form className="header__mobile-search-form" onSubmit={(e) => e.preventDefault()}>
+                <input
+                  type="text"
+                  placeholder="Busque por medicamentos, vitaminas..."
+                  className="header__mobile-search-input"
+                />
+                <button type="submit" className="header__mobile-search-button">
+                  <span>🔍</span>
+                </button>
+              </form>
             </div>
           </div>
         </div>
@@ -896,41 +923,58 @@ const Header = () => {
               ))}
             </div>
           ) : (
-            /* VIEW SUBCATEGORIAS COM TERCEIRA CATEGORIA */
+            /* VIEW SUBCATEGORIAS COM TERCEIRA CATEGORIA HIERÁRQUICA */
             <div className="header__mobile-subcategories">
-              {selectedCategory?.subcategories.map((subcat, index) => (
-                <div key={index} className="header__mobile-subcategory-group">
+              {selectedCategory?.subcategories.map((subcat, subcatIndex) => (
+                <div key={subcatIndex} className="header__mobile-subcategory-group">
                   <button
-                    className={`header__mobile-subcategory-header ${expandedSubcategory === index ? 'header__mobile-subcategory-header--expanded' : ''
+                    className={`header__mobile-subcategory-header ${expandedSecondLevelIndex === subcatIndex ? 'header__mobile-subcategory-header--expanded' : ''
                       }`}
-                    onClick={() => handleSubcategoryClick(index)}
+                    onClick={() => handleSecondLevelClick(subcatIndex)}
                   >
                     <div className="header__mobile-subcategory-info">
                       <span className="header__mobile-subcategory-icon">📋</span>
                       <span className="header__mobile-subcategory-title">{subcat.title}</span>
                     </div>
-                    <span className={`header__mobile-subcategory-toggle ${expandedSubcategory === index ? 'header__mobile-subcategory-toggle--expanded' : ''
+                    <span className={`header__mobile-subcategory-toggle ${expandedSecondLevelIndex === subcatIndex ? 'header__mobile-subcategory-toggle--expanded' : ''
                       }`}>
                       ▼
                     </span>
                   </button>
 
-                  {/* Itens da Segunda Categoria */}
-                  <div className="header__mobile-subcategory-items">
-                    {subcat.items.map((item, itemIndex) => (
-                      <a
-                        key={itemIndex}
-                        href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
-                        className="header__mobile-subcategory-link"
-                        onClick={toggleMobileMenu}
-                      >
-                        <span className="header__mobile-item-icon">•</span>
-                        {item}
-                      </a>
-                    ))}
-                  </div>
+                  {/* Conteúdo da segunda camada, agora contendo os NOMES dos produtos como itens clicáveis */}
+                  {expandedSecondLevelIndex === subcatIndex && subcat.thirdLevel && (
+                    <div className="header__mobile-second-level-expanded-content">
+                      <div className="header__mobile-product-group-grid"> {/* Grid para 2 colunas */}
+                        {subcat.thirdLevel.map((thirdLvlGroup, thirdLvlIndex) => (
+                          <div key={thirdLvlIndex} className="header__mobile-third-level-item-wrapper">
+                            <button
+                              className={`header__mobile-third-level-group-button ${expandedThirdLevelGroupIndex === thirdLvlIndex ? 'header__mobile-third-level-group-button--expanded' : ''}`}
+                              onClick={() => handleThirdLevelGroupClick(thirdLvlIndex)}
+                            >
+                              <span className="header__mobile-third-level-product-name">{thirdLvlGroup.name}</span>
+                              <span className={`header__mobile-third-level-toggle ${expandedThirdLevelGroupIndex === thirdLvlIndex ? 'header__mobile-third-level-toggle--expanded' : ''}`}>
+                                ▼
+                              </span>
+                            </button>
 
-                  
+                            {/* Conteúdo da terceira camada (ml/mg etc.) aparece SOMENTE se o produto for clicado */}
+                            {expandedThirdLevelGroupIndex === thirdLvlIndex && (
+                              <ul className="header__mobile-third-level-items-list">
+                                {thirdLvlGroup.items.map((item, itemIndex) => (
+                                  <li key={itemIndex}>
+                                    <a href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} className="header__mobile-third-level-item-link" onClick={toggleMobileMenu}>
+                                      {item}
+                                    </a>
+                                  </li>
+                                ))}
+                              </ul>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               ))}
 
