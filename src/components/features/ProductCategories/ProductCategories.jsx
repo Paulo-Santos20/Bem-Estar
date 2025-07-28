@@ -65,10 +65,7 @@ const ProductCategories = () => {
           <h2 className="product-categories__title">
             <span className="product-categories__title-icon">🏷️</span>
             Categorias Mais Procuradas
-          </h2>
-          <p className="product-categories__subtitle">
-            Encontre rapidamente o que você precisa nas nossas categorias mais vendidas
-          </p>
+          </h2>          
         </div>
 
         <div className="product-categories__grid">

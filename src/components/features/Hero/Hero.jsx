@@ -1,5 +1,6 @@
+// src/components/features/Hero/Hero.jsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import Button from '../../ui/Button/Button';
+import { useNavigate } from 'react-router-dom';
 import './Hero.css';
 
 const Hero = () => {
@@ -8,119 +9,65 @@ const Hero = () => {
   const [isTransitioning, setIsTransitioning] = useState(false);
   const autoPlayRef = useRef(null);
   const carouselRef = useRef(null);
+  const navigate = useNavigate();
 
-  // Dados dos slides do hero (usando useMemo para performance)
-  const heroSlides = React.useMemo(() => [
+  // Dados das promoções temporárias (usando useMemo para performance)
+  const promotionSlides = React.useMemo(() => [
     {
       id: 1,
-      title: 'Sua Saúde é Nossa Prioridade',
-      subtitle: 'Medicamentos de qualidade, atendimento especializado e cuidado que você merece',
-      description: 'Mais de 10 anos cuidando da saúde da sua família com profissionalismo e dedicação',
-      image: '/api/placeholder/1820/490',
-      ctaPrimary: {
-        text: 'Explorar Produtos',
-        action: 'products'
-      },
-      ctaSecondary: {
-        text: 'Nossos Serviços',
-        action: 'services'
-      },
-      badge: 'Farmácia de Confiança',
-      stats: [
-        { number: '10+', label: 'Anos de Experiência' },
-        { number: '500+', label: 'Produtos Disponíveis' },
-        { number: '24h', label: 'Entrega Rápida' }
-      ]
+      title: 'Mega Promoção Vitaminas',
+      description: 'Até 40% OFF em vitaminas e suplementos',
+      image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1920&h=350&fit=crop&crop=center',
+      link: '/produtos?category=vitaminas',
+      badge: 'Até 40% OFF',
+      backgroundColor: '#E53935',
+      textColor: '#FFFFFF'
     },
     {
       id: 2,
-      title: 'Entrega Rápida e Segura',
-      subtitle: 'Receba seus medicamentos no conforto da sua casa em até 2 horas',
-      description: 'Serviço de entrega disponível 24/7 com rastreamento em tempo real',
-      image: '/api/placeholder/1820/490',
-      ctaPrimary: {
-        text: 'Fazer Pedido',
-        action: 'order'
-      },
-      ctaSecondary: {
-        text: 'Como Funciona',
-        action: 'how-it-works'
-      },
-      badge: 'Entrega Expressa',
-      stats: [
-        { number: '2h', label: 'Tempo Médio' },
-        { number: '100%', label: 'Segurança' },
-        { number: '24/7', label: 'Disponibilidade' }
-      ]
+      title: 'Semana da Beleza',
+      description: 'Dermocosméticos com preços especiais',
+      image: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=1920&h=350&fit=crop&crop=center',
+      link: '/produtos?category=beleza',
+      badge: 'Oferta Especial',
+      backgroundColor: '#2196F3',
+      textColor: '#FFFFFF'
     },
     {
       id: 3,
-      title: 'Serviços Farmacêuticos Especializados',
-      subtitle: 'Aplicação de injetáveis, testes rápidos e orientação farmacêutica profissional',
-      description: 'Equipe qualificada para cuidar da sua saúde com segurança e eficiência',
-      image: '/api/placeholder/1820/490',
-      ctaPrimary: {
-        text: 'Agendar Serviço',
-        action: 'schedule'
-      },
-      ctaSecondary: {
-        text: 'Ver Serviços',
-        action: 'services'
-      },
-      badge: 'Atendimento Especializado',
-      stats: [
-        { number: '15+', label: 'Serviços Oferecidos' },
-        { number: '100%', label: 'Profissionais Qualificados' },
-        { number: '5★', label: 'Avaliação Média' }
-      ]
+      title: 'Medicamentos Genéricos',
+      description: 'Economia garantida com a mesma qualidade',
+      image: 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=1920&h=350&fit=crop&crop=center',
+      link: '/produtos?category=medicamentos',
+      badge: 'Melhor Preço',
+      backgroundColor: '#4CAF50',
+      textColor: '#FFFFFF'
     },
     {
       id: 4,
-      title: 'Vitaminas e Suplementos Premium',
-      subtitle: 'As melhores marcas em vitaminas e suplementos para sua saúde e bem-estar',
-      description: 'Produtos importados e nacionais com garantia de qualidade e procedência',
-      image: '/api/placeholder/1820/490',
-      ctaPrimary: {
-        text: 'Ver Vitaminas',
-        action: 'vitamins'
-      },
-      ctaSecondary: {
-        text: 'Orientação Nutricional',
-        action: 'nutrition'
-      },
-      badge: 'Qualidade Premium',
-      stats: [
-        { number: '50+', label: 'Marcas Disponíveis' },
-        { number: '200+', label: 'Produtos Premium' },
-        { number: '30%', label: 'Desconto Especial' }
-      ]
+      title: 'Entrega Grátis',
+      description: 'Frete grátis em compras acima de R\$ 99',
+      image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1920&h=350&fit=crop&crop=center',
+      link: '/produtos',
+      badge: 'Frete Grátis',
+      backgroundColor: '#FF9800',
+      textColor: '#FFFFFF'
     },
     {
       id: 5,
-      title: 'Beleza e Cuidados Pessoais',
-      subtitle: 'Produtos de beleza, dermocosméticos e cuidados pessoais das melhores marcas',
-      description: 'Cuide da sua pele e cabelos com produtos selecionados por especialistas',
-      image: '/api/placeholder/1820/490',
-      ctaPrimary: {
-        text: 'Explorar Beleza',
-        action: 'beauty'
-      },
-      ctaSecondary: {
-        text: 'Dicas de Cuidados',
-        action: 'tips'
-      },
-      badge: 'Beleza & Bem-Estar',
-      stats: [
-        { number: '100+', label: 'Produtos de Beleza' },
-        { number: '20+', label: 'Marcas Exclusivas' },
-        { number: '15%', label: 'Desconto Primeira Compra' }
-      ]
+      title: 'Cuidados com o Bebê',
+      description: 'Produtos infantis com até 30% de desconto',
+      image: 'https://images.unsplash.com/photo-1515488042361-ee00e0ddd4e4?w=1920&h=350&fit=crop&crop=center',
+      link: '/produtos?category=infantil',
+      badge: '30% OFF',
+      backgroundColor: '#9C27B0',
+      textColor: '#FFFFFF'
     }
   ], []);
 
   // Duplicar slides para carrossel infinito
-  const extendedSlides = React.useMemo(() => [...heroSlides, ...heroSlides, ...heroSlides], [heroSlides]);
-  const totalSlides = heroSlides.length;
+  const extendedSlides = React.useMemo(() => [...promotionSlides, ...promotionSlides, ...promotionSlides], [promotionSlides]);
+  const totalSlides = promotionSlides.length;
 
   // Função para ir para próximo slide
   const nextSlide = useCallback(() => {
@@ -136,12 +83,12 @@ const Hero = () => {
     setCurrentIndex(prev => prev - 1);
   }, [isTransitioning]);
 
-  // Auto-play (corrigido)
+  // Auto-play
   useEffect(() => {
     if (isAutoPlaying) {
       autoPlayRef.current = setInterval(() => {
         nextSlide();
-      }, 6000);
+      }, 5000); // 5 segundos para promoções
     } else {
       if (autoPlayRef.current) {
         clearInterval(autoPlayRef.current);
@@ -170,7 +117,7 @@ const Hero = () => {
       else if (currentIndex < 0) {
         setCurrentIndex(totalSlides - 1);
       }
-    }, 800);
+    }, 600); // Transição mais rápida para promoções
 
     return () => clearTimeout(timer);
   }, [currentIndex, totalSlides, isTransitioning]);
@@ -191,39 +138,30 @@ const Hero = () => {
     setCurrentIndex(index);
   }, [isTransitioning]);
 
-  // Handlers para ações
-  const handleAction = useCallback((action) => {
-    console.log('Ação:', action);
-    // Implementar navegação baseada na ação
-    switch (action) {
-      case 'products':
-        // navigate('/produtos');
-        break;
-      case 'services':
-        // navigate('/servicos');
-        break;
-      case 'order':
-        // navigate('/pedido');
-        break;
-      default:
-        console.log('Ação não implementada:', action);
+  // Handler para clique na promoção
+  const handlePromotionClick = useCallback((slide) => {
+    if (slide.link) {
+      navigate(slide.link);
     }
-  }, []);
+  }, [navigate]);
 
-  const handleImageError = useCallback((e) => {
+  // Fallback para imagens que não carregam
+  const handleImageError = useCallback((e, slide) => {
     const svgContent = `
-      <svg width="1820" height="490" viewBox="0 0 1820 490" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <svg width="1920" height="350" viewBox="0 0 1920 350" fill="none" xmlns="http://www.w3.org/2000/svg">
         <defs>
-          <linearGradient id="heroGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" style="stop-color:#E53935;stop-opacity:1" />
-            <stop offset="100%" style="stop-color:#2196F3;stop-opacity:1" />
+          <linearGradient id="promoGradient${slide.id}" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" style="stop-color:${slide.backgroundColor};stop-opacity:1" />
+            <stop offset="100%" style="stop-color:${slide.backgroundColor}88;stop-opacity:1" />
           </linearGradient>
         </defs>
-        <rect width="1820" height="490" fill="url(#heroGradient)"/>
-        <circle cx="910" cy="245" r="80" fill="white" opacity="0.2"/>
-        <path d="M870 225h80v40h-80v-40z" fill="white"/>
-        <path d="M890 205h40v80h-40v-80z" fill="white"/>
-        <text x="910" y="320" text-anchor="middle" fill="white" font-size="24" font-weight="bold">Farmacia Bem Estar</text>
+        <rect width="1920" height="350" fill="url(#promoGradient${slide.id})"/>
+        <rect x="50" y="100" width="120" height="150" rx="8" fill="white" opacity="0.2"/>
+        <circle cx="110" cy="175" r="30" fill="white" opacity="0.3"/>
+        <text x="200" y="150" fill="${slide.textColor}" font-size="48" font-weight="bold">${slide.title}</text>
+        <text x="200" y="200" fill="${slide.textColor}" font-size="24" opacity="0.9">${slide.description}</text>
+        <rect x="1650" y="80" width="220" height="60" rx="30" fill="white" opacity="0.2"/>
+        <text x="1760" y="120" text-anchor="middle" fill="${slide.textColor}" font-size="24" font-weight="bold">${slide.badge}</text>
       </svg>
     `;
     
@@ -232,71 +170,89 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="hero">
+    <section className="hero-promotions">
       <div 
-        className="hero__carousel"
+        className="hero-promotions__carousel"
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
         <div 
           ref={carouselRef}
-          className="hero__track"
+          className="hero-promotions__track"
           style={{
             transform: `translateX(-${(currentIndex + totalSlides) * 100}%)`,
-            transition: isTransitioning ? 'transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
+            transition: isTransitioning ? 'transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94)' : 'none'
           }}
         >
           {extendedSlides.map((slide, index) => (
-            <div key={`${slide.id}-${index}`} className="hero__slide">
-              <div className="hero__image-container">
+            <div 
+              key={`${slide.id}-${index}`} 
+              className="hero-promotions__slide"
+              onClick={() => handlePromotionClick(slide)}
+              style={{ cursor: slide.link ? 'pointer' : 'default' }}
+            >
+              <div className="hero-promotions__image-container">
                 <img
                   src={slide.image}
                   alt={slide.title}
-                  className="hero__image"
-                  onError={handleImageError}
+                  className="hero-promotions__image"
+                  onError={(e) => handleImageError(e, slide)}
                 />
-                <div className="hero__overlay"></div>
-              </div>
+                
+                {/* Overlay com gradiente sutil */}
+                <div 
+                  className="hero-promotions__overlay"
+                  style={{ 
+                    background: `linear-gradient(90deg, ${slide.backgroundColor}40 0%, transparent 50%, ${slide.backgroundColor}20 100%)` 
+                  }}
+                ></div>
 
-              <div className="hero__content">
-                <div className="container">
-                  <div className="hero__content-wrapper">
-                    <div className="hero__text-content">
-                      <div className="hero__badge">
-                        <span className="hero__badge-text">{slide.badge}</span>
-                      </div>
-
-                      <h1 className="hero__title">{slide.title}</h1>
-                      <h2 className="hero__subtitle">{slide.subtitle}</h2>
-                      <p className="hero__description">{slide.description}</p>
-
-                      <div className="hero__actions">
-                        <Button
-                          variant="primary"
-                          size="lg"
-                          onClick={() => handleAction(slide.ctaPrimary.action)}
-                          className="hero__cta-primary"
+                {/* Conteúdo sobreposto */}
+                <div className="hero-promotions__content">
+                  <div className="container">
+                    <div className="hero-promotions__content-wrapper">
+                      <div className="hero-promotions__text">
+                        <div 
+                          className="hero-promotions__badge"
+                          style={{ 
+                            backgroundColor: slide.backgroundColor,
+                            color: slide.textColor 
+                          }}
                         >
-                          {slide.ctaPrimary.text}
-                        </Button>
-                        <Button
-                          variant="outline"
-                          size="lg"
-                          onClick={() => handleAction(slide.ctaSecondary.action)}
-                          className="hero__cta-secondary"
-                        >
-                          {slide.ctaSecondary.text}
-                        </Button>
-                      </div>
-                    </div>
-
-                    <div className="hero__stats">
-                      {slide.stats.map((stat, statIndex) => (
-                        <div key={statIndex} className="hero__stat">
-                          <span className="hero__stat-number">{stat.number}</span>
-                          <span className="hero__stat-label">{stat.label}</span>
+                          {slide.badge}
                         </div>
-                      ))}
+                        <h2 
+                          className="hero-promotions__title"
+                          style={{ color: slide.textColor }}
+                        >
+                          {slide.title}
+                        </h2>
+                        <p 
+                          className="hero-promotions__description"
+                          style={{ color: slide.textColor }}
+                        >
+                          {slide.description}
+                        </p>
+                      </div>
+                      
+                      {slide.link && (
+                        <div className="hero-promotions__cta">
+                          <button 
+                            className="hero-promotions__button"
+                            style={{ 
+                              backgroundColor: slide.textColor,
+                              color: slide.backgroundColor 
+                            }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              navigate(slide.link);
+                            }}
+                          >
+                            Ver Ofertas
+                            <span className="hero-promotions__button-icon">→</span>
+                          </button>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
@@ -305,48 +261,52 @@ const Hero = () => {
           ))}
         </div>
 
-        {/* Controles de Navegação */}
+        {/* Controles de Navegação - MENORES E REDONDOS */}
         <button 
-          className="hero__control hero__control--prev"
+          className="hero-promotions__control hero-promotions__control--prev"
           onClick={prevSlide}
           disabled={isTransitioning}
-          aria-label="Slide anterior"
+          aria-label="Promoção anterior"
         >
-          <span className="hero__arrow">‹</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </button>
 
         <button 
-          className="hero__control hero__control--next"
+          className="hero-promotions__control hero-promotions__control--next"
           onClick={nextSlide}
           disabled={isTransitioning}
-          aria-label="Próximo slide"
+          aria-label="Próxima promoção"
         >
-          <span className="hero__arrow">›</span>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <path d="M9 18L15 12L9 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
         </button>
 
-        {/* Indicadores */}
-        <div className="hero__indicators">
-          {heroSlides.map((_, index) => (
-            <button
-              key={index}
-              className={`hero__indicator ${
-                index === (currentIndex % totalSlides) ? 'hero__indicator--active' : ''
-              }`}
-              onClick={() => goToSlide(index)}
-              aria-label={`Ir para slide ${index + 1}`}
-            />
-          ))}
-        </div>
-
         {/* Progress Bar */}
-        <div className="hero__progress">
+        <div className="hero-promotions__progress">
           <div 
-            className="hero__progress-bar"
+            className="hero-promotions__progress-bar"
             style={{
               transform: `scaleX(${((currentIndex % totalSlides) + 1) / totalSlides})`
             }}
           ></div>
         </div>
+      </div>
+
+      {/* Indicadores FORA do carousel, abaixo das fotos */}
+      <div className="hero-promotions__indicators">
+        {promotionSlides.map((_, index) => (
+          <button
+            key={index}
+            className={`hero-promotions__indicator ${
+              index === (currentIndex % totalSlides) ? 'hero-promotions__indicator--active' : ''
+            }`}
+            onClick={() => goToSlide(index)}
+            aria-label={`Ir para promoção ${index + 1}`}
+          />
+        ))}
       </div>
     </section>
   );

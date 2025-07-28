@@ -1,28 +1,31 @@
+// src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
-import { Header } from './components/common/Header';
-import { Footer } from './components/common/Footer';
-import { Home } from './pages/Home';
-import { Products } from './pages/Products';
-import { Product } from './pages/Product';
-import { Contact } from './pages/Contact'; 
-import { NotFound } from './pages/NotFound';
-import './styles/globals.css';
+
+// Importar páginas
+import Home from './pages/Home';
+import Products from './pages/Products/Products';
+import Product from './pages/Product/Product';
+import Contact from './pages/Contact/Contact';
+
+// Importar componentes - MUDANÇA AQUI
+import Header from './components/common/Header/Header';
+import Footer from './components/common/Footer/Footer'; // IMPORT DIRETO
 
 function App() {
   return (
     <CartProvider>
       <Router>
-        <div className="app">
+        <div className="App">
           <Header />
-          <main className="main-content">
+          <main>
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/produtos" element={<Products />} />
-              <Route path="/produto/:id" element={<Product />} />
+              <Route path="/produto/:slug" element={<Product />} />
               <Route path="/contato" element={<Contact />} />
-              <Route path="*" element={<NotFound />} />
+              <Route path="*" element={<div>Página não encontrada</div>} />
             </Routes>
           </main>
           <Footer />
