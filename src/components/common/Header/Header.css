@@ -94,6 +94,10 @@ body {
   margin: 0 auto;
   padding: 0 var(--spacing-lg);
 }
+.header__top-content, .header__nav {  max-width: 1400px; /* ALTERE ESTE VALOR PARA O MESMO max-width DO SEU .container GLOBAL */
+  margin: 0 auto;
+  padding: 0 var(--spacing-lg); /* Mantenha o padding se for intencional */
+}
 
 /* ===== LOGO DESKTOP ===== */
 .header__logo {
