@@ -1,4 +1,3 @@
-// src/App.jsx
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { CartProvider } from './contexts/CartContext';
@@ -9,9 +8,10 @@ import Products from './pages/Products/Products';
 import Product from './pages/Product/Product';
 import Contact from './pages/Contact/Contact';
 
-// Importar componentes - MUDANÇA AQUI
-import Header from './components/common/Header/Header';
-import Footer from './components/common/Footer/Footer'; // IMPORT DIRETO
+// Importar componentes
+import Header from './components/common/Header';
+import Footer from './components/common/Footer/Footer';
+import Cart from './components/common/Cart/Cart'; 
 
 function App() {
   return (
@@ -29,6 +29,7 @@ function App() {
             </Routes>
           </main>
           <Footer />
+          <Cart /> 
         </div>
       </Router>
     </CartProvider>

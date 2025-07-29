@@ -1,4 +1,6 @@
-import React, { useState } from 'react';
+// src/components/common/Header/Header.jsx
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../../contexts/CartContext';
 import './Header.css';
 
@@ -7,91 +9,171 @@ const Header = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMainCategory, setActiveMainCategory] = useState('medicamentos');
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [isScrolled, setIsScrolled] = useState(false);
 
   // Estados para navegação mobile hierárquica
-  const [mobileMenuView, setMobileMenuView] = useState('main'); // 'main' ou 'subcategory'
+  const [mobileMenuView, setMobileMenuView] = useState('main');
   const [selectedMobileCategory, setSelectedMobileCategory] = useState(null);
-  // Renomeado para maior clareza: controla a expansão da "segunda camada" (Dor e Febre)
   const [expandedSecondLevelIndex, setExpandedSecondLevelIndex] = useState(null);
-  // Novo estado: controla a expansão da "terceira camada" (Paracetamol dentro de Dor e Febre)
-  const [expandedThirdLevelGroupIndex, setExpandedThirdLevelGroupIndex] = useState(null);
 
+  const navigate = useNavigate();
 
-  const { items, itemCount, total, formatPrice, removeFromCart, updateQuantity } = useCart();
+  // Usar o contexto do carrinho com verificação de segurança
+  const cartContext = useCart();
+  const {
+    cartItems = [],
+    isCartOpen: cartContextOpen = false,
+    toggleCart,
+    removeFromCart,
+    updateQuantity,
+    getCartTotal,
+    getCartItemsCount,
+    formatPrice
+  } = cartContext || {};
+
+  // Scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Fechar menus ao redimensionar
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) {
+        setIsMobileMenuOpen(false);
+        setIsSearchOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  // Fechar menus ao clicar fora
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (!event.target.closest('.header__categories') && isCategoriesOpen) {
+        setIsCategoriesOpen(false);
+      }
+      if (!event.target.closest('.header__cart') && isCartOpen) {
+        setIsCartOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isCategoriesOpen, isCartOpen]);
+
+  // Calcular valores do carrinho com segurança
+  const itemCount = getCartItemsCount ? getCartItemsCount() : (Array.isArray(cartItems) ? cartItems.length : 0);
+  const total = getCartTotal ? getCartTotal() : 0;
+  const items = Array.isArray(cartItems) ? cartItems : [];
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/produtos?search=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+      setIsSearchOpen(false);
+    }
+  };
 
   const toggleCategories = () => {
     setIsCategoriesOpen(!isCategoriesOpen);
   };
 
-  const toggleCart = () => {
-    setIsCartOpen(!isCartOpen);
+  const handleCartToggle = () => {
+    if (toggleCart) {
+      toggleCart();
+    } else {
+      setIsCartOpen(!isCartOpen);
+    }
   };
 
   const toggleMobileMenu = () => {
     setIsMobileMenuOpen(!isMobileMenuOpen);
-    // Reset para view principal quando fechar
     if (isMobileMenuOpen) {
       setMobileMenuView('main');
       setSelectedMobileCategory(null);
-      setExpandedSecondLevelIndex(null); // Reset da segunda camada
-      setExpandedThirdLevelGroupIndex(null); // Reset da terceira camada
+      setExpandedSecondLevelIndex(null);
     }
   };
 
-  // Navegar para subcategorias no mobile (ex: Medicamentos -> Dor e Febre)
   const handleMobileCategoryClick = (categoryKey) => {
     setSelectedMobileCategory(categoryKey);
     setMobileMenuView('subcategory');
-    setExpandedSecondLevelIndex(null); // Reset ao mudar de categoria principal
-    setExpandedThirdLevelGroupIndex(null); // Reset ao mudar de categoria principal
+    setExpandedSecondLevelIndex(null);
   };
 
-  // Voltar para categorias principais no mobile
   const handleMobileBackToMain = () => {
     setMobileMenuView('main');
     setSelectedMobileCategory(null);
     setExpandedSecondLevelIndex(null);
-    setExpandedThirdLevelGroupIndex(null);
   };
 
-  // Toggle da segunda camada (ex: Dor e Febre)
   const handleSecondLevelClick = (index) => {
     if (expandedSecondLevelIndex === index) {
       setExpandedSecondLevelIndex(null);
-      setExpandedThirdLevelGroupIndex(null); // Colapsa a terceira camada junto
     } else {
       setExpandedSecondLevelIndex(index);
-      setExpandedThirdLevelGroupIndex(null); // Reseta a terceira camada ao abrir nova segunda camada
-    }
-  };
-
-  // Toggle da terceira camada (ex: Paracetamol)
-  const handleThirdLevelGroupClick = (thirdLvlIndex) => {
-    if (expandedThirdLevelGroupIndex === thirdLvlIndex) {
-      setExpandedThirdLevelGroupIndex(null);
-    } else {
-      setExpandedThirdLevelGroupIndex(thirdLvlIndex);
     }
   };
 
   const handleQuantityChange = (productId, newQuantity) => {
     if (newQuantity <= 0) {
-      removeFromCart(productId);
+      if (removeFromCart) removeFromCart(productId);
     } else {
-      updateQuantity(productId, newQuantity);
+      if (updateQuantity) updateQuantity(productId, newQuantity);
     }
+  };
+
+  const handleNavigation = (path) => {
+    navigate(path);
+    setIsMobileMenuOpen(false);
+    setIsCategoriesOpen(false);
+  };
+
+  const handleSearchToggle = () => {
+    setIsSearchOpen(!isSearchOpen);
+    if (!isSearchOpen) {
+      setTimeout(() => {
+        const searchInput = document.querySelector('.header__search-input');
+        if (searchInput) {
+          searchInput.focus();
+        }
+      }, 100);
+    }
+  };
+
+  // Função segura para formatar preço
+  const safeFormatPrice = (price) => {
+    if (formatPrice) {
+      return formatPrice(price);
+    }
+    const numPrice = typeof price === 'number' ? price : parseFloat(price) || 0;
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL'
+    }).format(numPrice);
   };
 
   // Categorias principais
   const mainCategories = [
-    { name: 'Medicamentos', href: '#medicamentos' },
-    { name: 'Vitaminas', href: '#vitaminas' },
-    { name: 'Beleza', href: '#beleza' },
-    { name: 'Higiene', href: '#higiene' },
-    { name: 'Suplementos', href: '#suplementos' }
+    { name: 'Medicamentos', href: '/produtos?category=medicamentos' },
+    { name: 'Vitaminas', href: '/produtos?category=vitaminas' },
+    { name: 'Beleza', href: '/produtos?category=beleza' },
+    { name: 'Higiene', href: '/produtos?category=higiene' },
+    { name: 'Suplementos', href: '/produtos?category=suplementos' }
   ];
 
-  // Estrutura completa de categorias com terceira categoria
+  // Estrutura de categorias SEM terceiro nível
   const categoriesData = {
     medicamentos: {
       title: '💊 Medicamentos',
@@ -99,45 +181,19 @@ const Header = () => {
       subcategories: [
         {
           title: 'Dor e Febre',
-          items: ['Paracetamol', 'Ibuprofeno', 'Aspirina', 'Dipirona', 'Nimesulida'], // 'items' pode ser redundante, usaremos thirdLevel.name
-          thirdLevel: [
-            { name: 'Paracetamol', items: ['500mg', '750mg', 'Gotas', 'Xarope'] },
-            { name: 'Ibuprofeno', items: ['400mg', '600mg', 'Gel', 'Suspensão'] },
-            { name: 'Aspirina', items: ['100mg', '500mg', 'Efervescente', 'Prevent'] },
-            { name: 'Dipirona', items: ['500mg', 'Gotas', 'Ampola', 'Sódica'] },
-            { name: 'Nimesulida', items: ['100mg', 'Gotas', 'Gel', 'Granulado'] }
-          ]
+          items: ['Paracetamol', 'Ibuprofeno', 'Aspirina', 'Dipirona', 'Nimesulida']
         },
         {
           title: 'Digestivos',
-          items: ['Antiácidos', 'Probióticos', 'Laxantes', 'Antidiarreicos', 'Enzimas'],
-          thirdLevel: [
-            { name: 'Antiácidos', items: ['Omeprazol', 'Pantoprazol', 'Esomeprazol', 'Lansoprazol'] },
-            { name: 'Probióticos', items: ['Lactobacillus', 'Bifidobacterium', 'Floratil', 'Kefir'] },
-            { name: 'Laxantes', items: ['Lactulose', 'Bisacodil', 'Docusato', 'Psyllium'] },
-            { name: 'Antidiarreicos', items: ['Loperamida', 'Racecadotrila', 'Floratil', 'Smecta'] },
-            { name: 'Enzimas', items: ['Pancreatina', 'Bromelina', 'Papaína', 'Lactase'] }
-          ]
+          items: ['Antiácidos', 'Probióticos', 'Laxantes', 'Antidiarreicos', 'Enzimas']
         },
         {
           title: 'Respiratórios',
-          items: ['Xaropes', 'Descongestionantes', 'Antialérgicos', 'Broncodilatadores'],
-          thirdLevel: [
-            { name: 'Xaropes', items: ['Expectorante', 'Antitussígeno', 'Mel', 'Natural'] },
-            { name: 'Descongestionantes', items: ['Spray Nasal', 'Gotas', 'Comprimidos', 'Inalação'] },
-            { name: 'Antialérgicos', items: ['Loratadina', 'Cetirizina', 'Desloratadina', 'Fexofenadina'] },
-            { name: 'Broncodilatadores', items: ['Salbutamol', 'Fenoterol', 'Formoterol', 'Budesonida'] }
-          ]
+          items: ['Xaropes', 'Descongestionantes', 'Antialérgicos', 'Broncodilatadores']
         },
         {
           title: 'Antibióticos',
-          items: ['Amoxicilina', 'Azitromicina', 'Cefalexina', 'Ciprofloxacino'],
-          thirdLevel: [
-            { name: 'Amoxicilina', items: ['500mg', '875mg', 'Suspensão', 'Clavulanato'] },
-            { name: 'Azitromicina', items: ['500mg', 'Suspensão', 'Comprimidos', 'Pó'] },
-            { name: 'Cefalexina', items: ['500mg', 'Suspensão', 'Cápsulas', 'Comprimidos'] },
-            { name: 'Ciprofloxacino', items: ['500mg', 'Gotas', 'Pomada', 'Injetável'] }
-          ]
+          items: ['Amoxicilina', 'Azitromicina', 'Cefalexina', 'Ciprofloxacino']
         }
       ],
       featured: [
@@ -167,47 +223,19 @@ const Header = () => {
       subcategories: [
         {
           title: 'Vitaminas',
-          items: ['Vitamina C', 'Vitamina D', 'Complexo B', 'Vitamina E', 'Ácido Fólico'],
-          thirdLevel: [
-            { name: 'Vitamina C', items: ['1000mg', '500mg', 'Efervescente', 'Mastigável'] },
-            { name: 'Vitamina D', items: ['1000UI', '2000UI', '5000UI', 'Gotas'] },
-            { name: 'Complexo B', items: ['Comprimidos', 'Cápsulas', 'Injetável', 'Sublingual'] },
-            { name: 'Vitamina E', items: ['400UI', 'Cápsulas', 'Óleo', 'Natural'] },
-            { name: 'Ácido Fólico', items: ['5mg', 'Gestante', 'Comprimidos', 'Metilfolato'] }
-          ]
+          items: ['Vitamina C', 'Vitamina D', 'Complexo B', 'Vitamina E', 'Ácido Fólico']
         },
         {
           title: 'Minerais',
-          items: ['Cálcio', 'Ferro', 'Zinco', 'Magnésio', 'Selênio'],
-          thirdLevel: [
-            { name: 'Cálcio', items: ['Carbonato', 'Citrato', 'D3', 'Quelato'] },
-            { name: 'Ferro', items: ['Sulfato', 'Quelato', 'Heme', 'Bisglicinato'] },
-            { name: 'Zinco', items: ['Quelato', 'Picolinato', 'Gluconato', 'Óxido'] },
-            { name: 'Magnésio', items: ['Dimalato', 'Glicina', 'Óxido', 'Cloreto'] },
-            { name: 'Selênio', items: ['Metionina', 'Levedura', 'Quelato', 'Orgânico'] }
-          ]
+          items: ['Cálcio', 'Ferro', 'Zinco', 'Magnésio', 'Selênio']
         },
         {
           title: 'Ômega',
-          items: ['Ômega 3', 'Ômega 6', 'Óleo de Peixe', 'DHA', 'EPA'],
-          thirdLevel: [
-            { name: 'Ômega 3', items: ['1000mg', '2000mg', 'Concentrado', 'Vegetal'] },
-            { name: 'Ômega 6', items: ['Prímula', 'Borragem', 'Cártamo', 'Girassol'] },
-            { name: 'Óleo de Peixe', items: ['Salmão', 'Sardinha', 'Bacalhau', 'Krill'] },
-            { name: 'DHA', items: ['Infantil', 'Gestante', 'Concentrado', 'Algas'] },
-            { name: 'EPA', items: ['Concentrado', 'Puro', 'Combinado', 'Ultra'] }
-          ]
+          items: ['Ômega 3', 'Ômega 6', 'Óleo de Peixe', 'DHA', 'EPA']
         },
         {
           title: 'Multivitamínicos',
-          items: ['Adulto', 'Infantil', 'Idoso', 'Gestante', 'Esportista'],
-          thirdLevel: [
-            { name: 'Adulto', items: ['Homem', 'Mulher', 'Unissex', 'Premium'] },
-            { name: 'Infantil', items: ['Gomas', 'Líquido', 'Mastigável', 'Pó'] },
-            { name: 'Idoso', items: ['50+', '60+', 'Memória', 'Energia'] },
-            { name: 'Gestante', items: ['Pré-natal', 'DHA', 'Ferro', 'Ácido Fólico'] },
-            { name: 'Esportista', items: ['Energia', 'Recuperação', 'Performance', 'Resistência'] }
-          ]
+          items: ['Adulto', 'Infantil', 'Idoso', 'Gestante', 'Esportista']
         }
       ],
       featured: [
@@ -222,12 +250,6 @@ const Header = () => {
           price: 39.90,
           originalPrice: 58.90,
           image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=60&h=60&fit=crop'
-        },
-        {
-          name: 'Multivitamínico',
-          price: 28.90,
-          originalPrice: 42.90,
-          image: 'https://images.unsplash.com/photo-1550572017-edd951aa8f72?w=60&h=60&fit=crop'
         }
       ]
     },
@@ -237,46 +259,19 @@ const Header = () => {
       subcategories: [
         {
           title: 'Proteção Solar',
-          items: ['FPS 30', 'FPS 60', 'Infantil', 'Facial', 'Corporal'],
-          thirdLevel: [
-            { name: 'FPS 30', items: ['Loção', 'Spray', 'Bastão', 'Gel'] },
-            { name: 'FPS 60', items: ['Facial', 'Corporal', 'Sport', 'Resistente'] },
-            { name: 'Infantil', items: ['Bebê', 'Criança', 'Hipoalérgico', 'Natural'] },
-            { name: 'Facial', items: ['Base', 'Mousse', 'Fluido', 'Toque Seco'] },
-            { name: 'Corporal', items: ['Loção', 'Óleo', 'Spray', 'Bastão'] }
-          ]
+          items: ['FPS 30', 'FPS 60', 'Infantil', 'Facial', 'Corporal']
         },
         {
           title: 'Hidratantes',
-          items: ['Facial', 'Corporal', 'Mãos', 'Pés', 'Anti-idade'],
-          thirdLevel: [
-            { name: 'Facial', items: ['Dia', 'Noite', 'Sérum', 'Gel'] },
-            { name: 'Corporal', items: ['Loção', 'Creme', 'Óleo', 'Manteiga'] },
-            { name: 'Mãos', items: ['Creme', 'Loção', 'Reparador', 'Noturno'] },
-            { name: 'Pés', items: ['Creme', 'Esfoliante', 'Reparador', 'Uréia'] },
-            { name: 'Anti-idade', items: ['Sérum', 'Creme', 'Contorno', 'Firmador'] }
-          ]
+          items: ['Facial', 'Corporal', 'Mãos', 'Pés', 'Anti-idade']
         },
         {
           title: 'Maquiagem',
-          items: ['Base', 'Batom', 'Rímel', 'Pó Compacto', 'Corretivo'],
-          thirdLevel: [
-            { name: 'Base', items: ['Líquida', 'Compacta', 'Mousse', 'Stick'] },
-            { name: 'Batom', items: ['Matte', 'Cremoso', 'Líquido', 'Gloss'] },
-            { name: 'Rímel', items: ['Volume', 'Alongamento', 'Curvatura', 'À Prova D\'água'] },
-            { name: 'Pó Compacto', items: ['Translúcido', 'Com Cor', 'Matificante', 'Iluminador'] },
-            { name: 'Corretivo', items: ['Líquido', 'Bastão', 'Paleta', 'Concealer'] }
-          ]
+          items: ['Base', 'Batom', 'Rímel', 'Pó Compacto', 'Corretivo']
         },
         {
           title: 'Perfumes',
-          items: ['Feminino', 'Masculino', 'Infantil', 'Desodorante Colônia'],
-          thirdLevel: [
-            { name: 'Feminino', items: ['Floral', 'Frutado', 'Oriental', 'Amadeirado'] },
-            { name: 'Masculino', items: ['Amadeirado', 'Cítrico', 'Oriental', 'Aromático'] },
-            { name: 'Infantil', items: ['Menina', 'Menino', 'Unissex', 'Suave'] },
-            { name: 'Desodorante Colônia', items: ['Feminino', 'Masculino', 'Infantil', 'Unissex'] }
-          ]
+          items: ['Feminino', 'Masculino', 'Infantil', 'Desodorante Colônia']
         }
       ],
       featured: [
@@ -284,18 +279,6 @@ const Header = () => {
           name: 'Protetor Solar FPS 60',
           price: 34.90,
           originalPrice: 49.90,
-          image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=60&h=60&fit=crop'
-        },
-        {
-          name: 'Hidratante Facial',
-          price: 25.90,
-          originalPrice: 38.90,
-          image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=60&h=60&fit=crop'
-        },
-        {
-          name: 'Base Líquida',
-          price: 45.90,
-          originalPrice: 65.90,
           image: 'https://images.unsplash.com/photo-1556228720-195a672e8a03?w=60&h=60&fit=crop'
         }
       ]
@@ -306,44 +289,19 @@ const Header = () => {
       subcategories: [
         {
           title: 'Cabelos',
-          items: ['Shampoo', 'Condicionador', 'Máscara', 'Finalizadores', 'Anticaspa'],
-          thirdLevel: [
-            { name: 'Shampoo', items: ['Anticaspa', 'Hidratante', 'Oleoso', 'Seco'] },
-            { name: 'Condicionador', items: ['Hidratante', 'Reparador', 'Leave-in', 'Sem Enxágue'] },
-            { name: 'Máscara', items: ['Hidratante', 'Nutritiva', 'Reparadora', 'Reconstrução'] },
-            { name: 'Finalizadores', items: ['Creme', 'Óleo', 'Sérum', 'Spray'] },
-            { name: 'Anticaspa', items: ['Shampoo', 'Loção', 'Tônico', 'Tratamento'] }
-          ]
+          items: ['Shampoo', 'Condicionador', 'Máscara', 'Finalizadores', 'Anticaspa']
         },
         {
           title: 'Corpo',
-          items: ['Sabonetes', 'Gel de Banho', 'Esfoliantes', 'Óleos Corporais'],
-          thirdLevel: [
-            { name: 'Sabonetes', items: ['Líquido', 'Barra', 'Íntimo', 'Antibacteriano'] },
-            { name: 'Gel de Banho', items: ['Hidratante', 'Relaxante', 'Energizante', 'Perfumado'] },
-            { name: 'Esfoliantes', items: ['Corporal', 'Facial', 'Pés', 'Natural'] },
-            { name: 'Óleos Corporais', items: ['Hidratante', 'Relaxante', 'Aromático', 'Seco'] }
-          ]
+          items: ['Sabonetes', 'Gel de Banho', 'Esfoliantes', 'Óleos Corporais']
         },
         {
           title: 'Bucal',
-          items: ['Creme Dental', 'Enxaguante', 'Fio Dental', 'Escova de Dente'],
-          thirdLevel: [
-            { name: 'Creme Dental', items: ['Branqueador', 'Sensibilidade', 'Total', 'Natural'] },
-            { name: 'Enxaguante', items: ['Antisséptico', 'Branqueador', 'Sensibilidade', 'Herbal'] },
-            { name: 'Fio Dental', items: ['Encerado', 'Sem Cera', 'Sabor', 'Fita'] },
-            { name: 'Escova de Dente', items: ['Macia', 'Média', 'Elétrica', 'Infantil'] }
-          ]
+          items: ['Creme Dental', 'Enxaguante', 'Fio Dental', 'Escova de Dente']
         },
         {
           title: 'Desodorantes',
-          items: ['Roll-on', 'Aerosol', 'Stick', 'Antitranspirante'],
-          thirdLevel: [
-            { name: 'Roll-on', items: ['48h', '72h', 'Natural', 'Sem Álcool'] },
-            { name: 'Aerosol', items: ['Masculino', 'Feminino', 'Unissex', 'Compacto'] },
-            { name: 'Stick', items: ['Sólido', 'Gel', 'Transparente', 'Cremoso'] },
-            { name: 'Antitranspirante', items: ['Clinical', 'Extra Seco', 'Noturno', 'Intenso'] }
-          ]
+          items: ['Roll-on', 'Aerosol', 'Stick', 'Antitranspirante']
         }
       ],
       featured: [
@@ -351,18 +309,6 @@ const Header = () => {
           name: 'Shampoo Anticaspa',
           price: 16.90,
           originalPrice: 24.90,
-          image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=60&h=60&fit=crop'
-        },
-        {
-          name: 'Sabonete Líquido',
-          price: 8.90,
-          originalPrice: 12.90,
-          image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=60&h=60&fit=crop'
-        },
-        {
-          name: 'Creme Dental',
-          price: 5.90,
-          originalPrice: 8.90,
           image: 'https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=60&h=60&fit=crop'
         }
       ]
@@ -373,44 +319,19 @@ const Header = () => {
       subcategories: [
         {
           title: 'Proteínas',
-          items: ['Whey Protein', 'Caseína', 'Albumina', 'Proteína Vegetal'],
-          thirdLevel: [
-            { name: 'Whey Protein', items: ['Concentrado', 'Isolado', 'Hidrolisado', 'Blend'] },
-            { name: 'Caseína', items: ['Micelar', 'Hidrolisada', 'Noturna', 'Lenta'] },
-            { name: 'Albumina', items: ['Pura', 'Sabor', 'Pasteurizada', 'Natural'] },
-            { name: 'Proteína Vegetal', items: ['Ervilha', 'Soja', 'Arroz', 'Hemp'] }
-          ]
+          items: ['Whey Protein', 'Caseína', 'Albumina', 'Proteína Vegetal']
         },
         {
           title: 'Energéticos',
-          items: ['Creatina', 'Cafeína', 'Taurina', 'Guaraná', 'Açaí'],
-          thirdLevel: [
-            { name: 'Creatina', items: ['Monohidratada', 'Alcalina', 'HCL', 'Micronizada'] },
-            { name: 'Cafeína', items: ['Anidra', 'Natural', 'Cápsulas', 'Pó'] },
-            { name: 'Taurina', items: ['Pura', 'Combinada', 'Cápsulas', 'Pó'] },
-            { name: 'Guaraná', items: ['Extrato', 'Pó', 'Cápsulas', 'Natural'] },
-            { name: 'Açaí', items: ['Pó', 'Cápsulas', 'Extrato', 'Liofilizado'] }
-          ]
+          items: ['Creatina', 'Cafeína', 'Taurina', 'Guaraná', 'Açaí']
         },
         {
           title: 'Emagrecimento',
-          items: ['Termogênicos', 'Bloqueadores', 'Diuréticos', 'Fibras'],
-          thirdLevel: [
-            { name: 'Termogênicos', items: ['Cafeína', 'Chá Verde', 'Sinefrina', 'Natural'] },
-            { name: 'Bloqueadores', items: ['Carboidrato', 'Gordura', 'Açúcar', 'Apetite'] },
-            { name: 'Diuréticos', items: ['Natural', 'Chás', 'Cápsulas', 'Hibisco'] },
-            { name: 'Fibras', items: ['Psyllium', 'Glucomannan', 'Quitosana', 'Solúveis'] }
-          ]
+          items: ['Termogênicos', 'Bloqueadores', 'Diuréticos', 'Fibras']
         },
         {
           title: 'Recuperação',
-          items: ['BCAA', 'Glutamina', 'Arginina', 'HMB'],
-          thirdLevel: [
-            { name: 'BCAA', items: ['2:1:1', '4:1:1', '8:1:1', 'Instantâneo'] },
-            { name: 'Glutamina', items: ['L-Glutamina', 'Peptídeo', 'Pura', 'Micronizada'] },
-            { name: 'Arginina', items: ['L-Arginina', 'AAKG', 'Pura', 'Combinada'] },
-            { name: 'HMB', items: ['Cálcio', 'Livre', 'Cápsulas', 'Pó'] }
-          ]
+          items: ['BCAA', 'Glutamina', 'Arginina', 'HMB']
         }
       ],
       featured: [
@@ -419,36 +340,60 @@ const Header = () => {
           price: 89.90,
           originalPrice: 129.90,
           image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=60&h=60&fit=crop'
-        },
-        {
-          name: 'Creatina 300g',
-          price: 45.90,
-          originalPrice: 65.90,
-          image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=60&h=60&fit=crop'
-        },
-        {
-          name: 'BCAA 120 caps',
-          price: 35.90,
-          originalPrice: 52.90,
-          image: 'https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=60&h=60&fit=crop'
         }
       ]
     }
   };
 
-  const currentCategory = categoriesData[activeMainCategory];
+  const currentCategory = categoriesData[activeMainCategory] || categoriesData.medicamentos;
   const selectedCategory = selectedMobileCategory ? categoriesData[selectedMobileCategory] : null;
 
   return (
-    <header className="header">
+    <header className={`header ${isScrolled ? 'header--scrolled' : ''}`}>
       {/* ===== LAYOUT DESKTOP ===== */}
       <div className="header__desktop">
         {/* SEÇÃO SUPERIOR */}
         <div className="header__top">
           <div className="container">
             <div className="header__top-content">
+              <div className="header__top-info">
+                <span className="header__top-item">
+                  <span className="header__top-icon">📞</span>
+                  (81) 99528-4440
+                </span>
+                <span className="header__top-item">
+                  <span className="header__top-icon">📍</span>
+                  Rua das Flores, 123 - Centro
+                </span>
+                <span className="header__top-item">
+                  <span className="header__top-icon">⏰</span>
+                  Seg-Sáb: 7h-22h
+                </span>
+              </div>
+              <div className="header__top-social">
+                <a href="#" className="header__top-social-link" aria-label="Facebook">
+                  📘
+                </a>
+                <a href="#" className="header__top-social-link" aria-label="Instagram">
+                  📷
+                </a>
+                <a href="#" className="header__top-social-link" aria-label="WhatsApp">
+                  💬
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* SEÇÃO PRINCIPAL */}
+        <div className="header__main">
+          <div className="container">
+            <div className="header__main-content">
               {/* Logo */}
-              <a href="/" className="header__logo">
+              <button
+                className="header__logo"
+                onClick={() => handleNavigation('/')}
+              >
                 <div className="header__logo-icon">
                   <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                     <circle cx="20" cy="20" r="18" fill="#E53935" />
@@ -460,15 +405,17 @@ const Header = () => {
                   <span className="header__logo-name">Bem Estar</span>
                   <span className="header__logo-tagline">Farmácia</span>
                 </div>
-              </a>
+              </button>
 
               {/* Busca Central */}
-              <div className="header__search">
-                <form className="header__search-form" onSubmit={(e) => e.preventDefault()}>
+              <div className={`header__search ${isSearchOpen ? 'header__search--open' : ''}`}>
+                <form className="header__search-form" onSubmit={handleSearch}>
                   <input
                     type="text"
                     placeholder="Busque por medicamentos, vitaminas, beleza..."
                     className="header__search-input"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
                   />
                   <button type="submit" className="header__search-button">
                     <span>🔍</span>
@@ -478,12 +425,31 @@ const Header = () => {
 
               {/* Ações do Header */}
               <div className="header__actions">
+                {/* Busca mobile */}
+                <button
+                  className="header__action header__action--search"
+                  onClick={handleSearchToggle}
+                  aria-label="Buscar"
+                >
+                  🔍
+                </button>
+
+                {/* Favoritos */}
+                <button
+                  className="header__action header__action--favorites"
+                  onClick={() => handleNavigation('/favoritos')}
+                  aria-label="Favoritos"
+                >
+                  <span className="header__action-icon">❤️</span>
+                  <span className="header__action-badge">0</span>
+                </button>
+
                 {/* Carrinho */}
                 <div className="header__cart">
                   <button
                     className="header__cart-button"
-                    onClick={toggleCart}
-                    aria-label="Abrir carrinho"
+                    onClick={handleCartToggle}
+                    aria-label={`Carrinho com ${itemCount} itens`}
                   >
                     <span className="header__cart-icon">🛒</span>
                     <div className="header__cart-info">
@@ -496,15 +462,14 @@ const Header = () => {
                       <span className="header__cart-badge">{itemCount}</span>
                     )}
                   </button>
-
                   {/* Dropdown do Carrinho */}
-                  {isCartOpen && (
+                  {(isCartOpen || cartContextOpen) && (
                     <div className="header__cart-dropdown">
                       <div className="header__cart-header">
                         <h3>Meu Carrinho</h3>
                         <button
                           className="header__cart-close"
-                          onClick={toggleCart}
+                          onClick={handleCartToggle}
                           aria-label="Fechar carrinho"
                         >
                           ✕
@@ -519,26 +484,29 @@ const Header = () => {
                             <div key={item.id} className="header__cart-item">
                               <img
                                 src={item.image}
-                                alt={item.title}
+                                alt={item.title || item.name}
                                 className="header__cart-item-image"
+                                onError={(e) => {
+                                  e.target.src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=60&h=60&fit=crop';
+                                }}
                               />
                               <div className="header__cart-item-info">
-                                <h4 className="header__cart-item-title">{item.title}</h4>
+                                <h4 className="header__cart-item-title">{item.title || item.name}</h4>
                                 <p className="header__cart-item-price">
-                                  {formatPrice(item.offerPrice)}
+                                  {safeFormatPrice(item.offerPrice || item.price)}
                                 </p>
                                 <div className="header__cart-item-quantity">
                                   <button
                                     onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                                    className="header__cart-quantity-btn"
+                                    className="header__cart-quantity-btn header__cart-quantity-btn--decrease"
                                     aria-label="Diminuir quantidade"
                                   >
-                                    -
+                                    −
                                   </button>
-                                  <span>{item.quantity}</span>
+                                  <span className="header__cart-quantity-display">{item.quantity}</span>
                                   <button
                                     onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                                    className="header__cart-quantity-btn"
+                                    className="header__cart-quantity-btn header__cart-quantity-btn--increase"
                                     aria-label="Aumentar quantidade"
                                   >
                                     +
@@ -546,7 +514,7 @@ const Header = () => {
                                 </div>
                               </div>
                               <button
-                                onClick={() => removeFromCart(item.id)}
+                                onClick={() => removeFromCart && removeFromCart(item.id)}
                                 className="header__cart-item-remove"
                                 aria-label="Remover item"
                               >
@@ -560,15 +528,19 @@ const Header = () => {
                       {items.length > 0 && (
                         <div className="header__cart-footer">
                           <div className="header__cart-total">
-                            <strong>Total: {formatPrice(total)}</strong>
+                            <strong>Total: {safeFormatPrice(total)}</strong>
                           </div>
-                          <button className="header__cart-checkout">
+                          <button
+                            className="header__cart-checkout"
+                            onClick={() => handleNavigation('/checkout')}
+                          >
                             Finalizar Compra
                           </button>
                         </div>
                       )}
                     </div>
                   )}
+
                 </div>
               </div>
             </div>
@@ -592,7 +564,7 @@ const Header = () => {
                   <span className="header__categories-arrow">▼</span>
                 </button>
 
-                {/* Dropdown de Categorias - LAYOUT 3 COLUNAS */}
+                {/* Dropdown de Categorias - SEM TERCEIRO NÍVEL */}
                 {isCategoriesOpen && (
                   <div className="header__categories-dropdown">
                     <div className="header__categories-content">
@@ -601,10 +573,12 @@ const Header = () => {
                         {Object.keys(categoriesData).map((categoryKey) => (
                           <button
                             key={categoryKey}
-                            className={`header__main-category ${activeMainCategory === categoryKey ? 'header__main-category--active' : ''
-                              }`}
+                            className={`header__main-category ${activeMainCategory === categoryKey ? 'header__main-category--active' : ''}`}
                             onMouseEnter={() => setActiveMainCategory(categoryKey)}
-                            onClick={() => setActiveMainCategory(categoryKey)}
+                            onClick={() => {
+                              setActiveMainCategory(categoryKey);
+                              handleNavigation(`/produtos?category=${categoryKey}`);
+                            }}
                           >
                             <span className="header__main-category-icon">
                               {categoriesData[categoryKey].icon}
@@ -616,35 +590,30 @@ const Header = () => {
                         ))}
                       </div>
 
-                      {/* COLUNA 2 - SUBCATEGORIAS & TERCEIRO NÍVEL */}
+                      {/* COLUNA 2 - SUBCATEGORIAS SIMPLES */}
                       <div className="header__subcategories-wrapper">
                         <h3 className="header__subcategories-area-title">
                           {currentCategory.title}
                         </h3>
                         <div className="header__subcategories-grid">
                           {currentCategory.subcategories.map((subcat, index) => (
-                            <div key={index} className="header__subcategory-group-expanded">
-                              <h4 className="header__subcategory-group-title-expanded">
+                            <div key={index} className="header__subcategory-group-simple">
+                              <h4 className="header__subcategory-title-simple">
                                 {subcat.title}
                               </h4>
-                              <ul className="header__third-level-list">
-                                {subcat.thirdLevel && subcat.thirdLevel.map((thirdLvlGroup, thirdLvlIndex) => (
-                                  <li key={thirdLvlIndex} className="header__third-level-group">
-                                    <span className="header__third-level-group-name">{thirdLvlGroup.name}:</span>
-                                    <div className="header__third-level-items">
-                                      {thirdLvlGroup.items.map((item, itemIndex) => (
-                                        <a
-                                          key={itemIndex}
-                                          href={`#${item.toLowerCase().replace(/\s+/g, '-')}`}
-                                          className="header__third-level-link"
-                                        >
-                                          {item}
-                                        </a>
-                                      ))}
-                                    </div>
-                                  </li>
+                              <div className="header__subcategory-items">
+                                {subcat.items.map((item, itemIndex) => (
+                                  <button
+                                    key={itemIndex}
+                                    className="header__subcategory-item-link"
+                                    onClick={() => {
+                                      handleNavigation(`/produtos?search=${encodeURIComponent(item)}`);
+                                    }}
+                                  >
+                                    {item}
+                                  </button>
                                 ))}
-                              </ul>
+                              </div>
                             </div>
                           ))}
                         </div>
@@ -657,26 +626,29 @@ const Header = () => {
                         </h3>
                         <div className="header__featured-list">
                           {currentCategory.featured.map((product, index) => (
-                            <div
+                            <button
                               key={index}
                               className="header__featured-product"
-                              onClick={() => console.log('Produto clicado:', product.name)}
+                              onClick={() => handleNavigation(`/produtos?search=${encodeURIComponent(product.name)}`)}
                             >
                               <img
                                 src={product.image}
                                 alt={product.name}
                                 className="header__featured-image"
+                                onError={(e) => {
+                                  e.target.src = 'https://images.unsplash.com/photo-1584308666744-24d5c474f2ae?w=60&h=60&fit=crop';
+                                }}
                               />
                               <div className="header__featured-info">
                                 <h4 className="header__featured-name">{product.name}</h4>
                                 <p className="header__featured-price">
-                                  {formatPrice(product.price)}
+                                  {safeFormatPrice(product.price)}
                                   <span className="header__featured-original-price">
-                                    {formatPrice(product.originalPrice)}
+                                    {safeFormatPrice(product.originalPrice)}
                                   </span>
                                 </p>
                               </div>
-                            </div>
+                            </button>
                           ))}
                         </div>
                       </div>
@@ -690,9 +662,12 @@ const Header = () => {
                 <ul className="header__main-nav-list">
                   {mainCategories.map((category, index) => (
                     <li key={index}>
-                      <a href={category.href} className="header__main-nav-link">
+                      <button
+                        className="header__main-nav-link"
+                        onClick={() => handleNavigation(category.href)}
+                      >
                         {category.name}
-                      </a>
+                      </button>
                     </li>
                   ))}
                 </ul>
@@ -700,12 +675,18 @@ const Header = () => {
 
               {/* Links Adicionais */}
               <div className="header__extra-links">
-                <a href="#ofertas" className="header__extra-link header__extra-link--highlight">
+                <button
+                  className="header__extra-link header__extra-link--highlight"
+                  onClick={() => handleNavigation('/ofertas')}
+                >
                   🔥 Ofertas
-                </a>
-                <a href="#contato" className="header__extra-link">
+                </button>
+                <button
+                  className="header__extra-link"
+                  onClick={() => handleNavigation('/contato')}
+                >
                   Contato
-                </a>
+                </button>
               </div>
             </div>
           </div>
@@ -728,7 +709,10 @@ const Header = () => {
               </button>
 
               {/* Logo Mobile */}
-              <a href="/" className="header__mobile-logo">
+              <button
+                className="header__mobile-logo"
+                onClick={() => handleNavigation('/')}
+              >
                 <div className="header__mobile-logo-icon">
                   <svg width="32" height="32" viewBox="0 0 40 40" fill="none">
                     <circle cx="20" cy="20" r="18" fill="#E53935" />
@@ -740,13 +724,13 @@ const Header = () => {
                   <span className="header__mobile-logo-name">Bem Estar</span>
                   <span className="header__mobile-logo-tagline">Farmácia</span>
                 </div>
-              </a>
+              </button>
 
               {/* Carrinho Mobile */}
               <div className="header__mobile-cart">
                 <button
                   className="header__mobile-cart-button"
-                  onClick={toggleCart}
+                  onClick={handleCartToggle}
                   aria-label="Abrir carrinho"
                 >
                   <span className="header__mobile-cart-icon">🛒</span>
@@ -754,79 +738,6 @@ const Header = () => {
                     <span className="header__mobile-cart-badge">{itemCount}</span>
                   )}
                 </button>
-
-                {/* Dropdown do Carrinho Mobile */}
-                {isCartOpen && (
-                  <div className="header__cart-dropdown">
-                    <div className="header__cart-header">
-                      <h3>Meu Carrinho</h3>
-                      <button
-                        className="header__cart-close"
-                        onClick={toggleCart}
-                        aria-label="Fechar carrinho"
-                      >
-                        ✕
-                      </button>
-                    </div>
-
-                    <div className="header__cart-items">
-                      {items.length === 0 ? (
-                        <p className="header__cart-empty">Seu carrinho está vazio</p>
-                      ) : (
-                        items.map(item => (
-                          <div key={item.id} className="header__cart-item">
-                            <img
-                              src={item.image}
-                              alt={item.title}
-                              className="header__cart-item-image"
-                            />
-                            <div className="header__cart-item-info">
-                              <h4 className="header__cart-item-title">{item.title}</h4>
-                              <p className="header__cart-item-price">
-                                {formatPrice(item.offerPrice)}
-                              </p>
-                              <div className="header__cart-item-quantity">
-                                <button
-                                  onClick={() => handleQuantityChange(item.id, item.quantity - 1)}
-                                  className="header__cart-quantity-btn"
-                                  aria-label="Diminuir quantidade"
-                                >
-                                  -
-                                </button>
-                                <span>{item.quantity}</span>
-                                <button
-                                  onClick={() => handleQuantityChange(item.id, item.quantity + 1)}
-                                  className="header__cart-quantity-btn"
-                                  aria-label="Aumentar quantidade"
-                                >
-                                  +
-                                </button>
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => removeFromCart(item.id)}
-                              className="header__cart-item-remove"
-                              aria-label="Remover item"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        ))
-                      )}
-                    </div>
-
-                    {items.length > 0 && (
-                      <div className="header__cart-footer">
-                        <div className="header__cart-total">
-                          <strong>Total: {formatPrice(total)}</strong>
-                        </div>
-                        <button className="header__cart-checkout">
-                          Finalizar Compra
-                        </button>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -836,11 +747,13 @@ const Header = () => {
         <div className="header__mobile-search">
           <div className="container">
             <div className="header__mobile-search-container">
-              <form className="header__mobile-search-form" onSubmit={(e) => e.preventDefault()}>
+              <form className="header__mobile-search-form" onSubmit={handleSearch}>
                 <input
                   type="text"
                   placeholder="Busque por medicamentos, vitaminas..."
                   className="header__mobile-search-input"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                 />
                 <button type="submit" className="header__mobile-search-button">
                   <span>🔍</span>
@@ -857,7 +770,7 @@ const Header = () => {
         onClick={toggleMobileMenu}
       ></div>
 
-      {/* Menu Mobile Hierárquico com Terceira Categoria */}
+      {/* Menu Mobile Simplificado - SEM TERCEIRO NÍVEL */}
       <div className={`header__mobile-menu ${isMobileMenuOpen ? 'header__mobile-menu--show' : ''}`}>
         <div className="header__mobile-menu-header">
           {mobileMenuView === 'main' ? (
@@ -872,7 +785,10 @@ const Header = () => {
                 onClick={toggleMobileMenu}
                 aria-label="Fechar menu"
               >
-                ✕
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
               </button>
             </>
           ) : (
@@ -894,7 +810,10 @@ const Header = () => {
                 onClick={toggleMobileMenu}
                 aria-label="Fechar menu"
               >
-                ✕
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <line x1="18" y1="6" x2="6" y2="18"></line>
+                  <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
               </button>
             </>
           )}
@@ -923,56 +842,36 @@ const Header = () => {
               ))}
             </div>
           ) : (
-            /* VIEW SUBCATEGORIAS COM TERCEIRA CATEGORIA HIERÁRQUICA */
+            /* VIEW SUBCATEGORIAS SIMPLIFICADAS */
             <div className="header__mobile-subcategories">
               {selectedCategory?.subcategories.map((subcat, subcatIndex) => (
                 <div key={subcatIndex} className="header__mobile-subcategory-group">
                   <button
-                    className={`header__mobile-subcategory-header ${expandedSecondLevelIndex === subcatIndex ? 'header__mobile-subcategory-header--expanded' : ''
-                      }`}
+                    className={`header__mobile-subcategory-header ${expandedSecondLevelIndex === subcatIndex ? 'header__mobile-subcategory-header--expanded' : ''}`}
                     onClick={() => handleSecondLevelClick(subcatIndex)}
                   >
                     <div className="header__mobile-subcategory-info">
                       <span className="header__mobile-subcategory-icon">📋</span>
                       <span className="header__mobile-subcategory-title">{subcat.title}</span>
                     </div>
-                    <span className={`header__mobile-subcategory-toggle ${expandedSecondLevelIndex === subcatIndex ? 'header__mobile-subcategory-toggle--expanded' : ''
-                      }`}>
+                    <span className={`header__mobile-subcategory-toggle ${expandedSecondLevelIndex === subcatIndex ? 'header__mobile-subcategory-toggle--expanded' : ''}`}>
                       ▼
                     </span>
                   </button>
 
-                  {/* Conteúdo da segunda camada, agora contendo os NOMES dos produtos como itens clicáveis */}
-                  {expandedSecondLevelIndex === subcatIndex && subcat.thirdLevel && (
-                    <div className="header__mobile-second-level-expanded-content">
-                      <div className="header__mobile-product-group-grid"> {/* Grid para 2 colunas */}
-                        {subcat.thirdLevel.map((thirdLvlGroup, thirdLvlIndex) => (
-                          <div key={thirdLvlIndex} className="header__mobile-third-level-item-wrapper">
-                            <button
-                              className={`header__mobile-third-level-group-button ${expandedThirdLevelGroupIndex === thirdLvlIndex ? 'header__mobile-third-level-group-button--expanded' : ''}`}
-                              onClick={() => handleThirdLevelGroupClick(thirdLvlIndex)}
-                            >
-                              <span className="header__mobile-third-level-product-name">{thirdLvlGroup.name}</span>
-                              <span className={`header__mobile-third-level-toggle ${expandedThirdLevelGroupIndex === thirdLvlIndex ? 'header__mobile-third-level-toggle--expanded' : ''}`}>
-                                ▼
-                              </span>
-                            </button>
-
-                            {/* Conteúdo da terceira camada (ml/mg etc.) aparece SOMENTE se o produto for clicado */}
-                            {expandedThirdLevelGroupIndex === thirdLvlIndex && (
-                              <ul className="header__mobile-third-level-items-list">
-                                {thirdLvlGroup.items.map((item, itemIndex) => (
-                                  <li key={itemIndex}>
-                                    <a href={`#${item.toLowerCase().replace(/\s+/g, '-')}`} className="header__mobile-third-level-item-link" onClick={toggleMobileMenu}>
-                                      {item}
-                                    </a>
-                                  </li>
-                                ))}
-                              </ul>
-                            )}
-                          </div>
-                        ))}
-                      </div>
+                  {expandedSecondLevelIndex === subcatIndex && (
+                    <div className="header__mobile-subcategory-items">
+                      {subcat.items.map((item, itemIndex) => (
+                        <button
+                          key={itemIndex}
+                          className="header__mobile-subcategory-item-link"
+                          onClick={() => {
+                            handleNavigation(`/produtos?search=${encodeURIComponent(item)}`);
+                          }}
+                        >
+                          {item}
+                        </button>
+                      ))}
                     </div>
                   )}
                 </div>
@@ -980,10 +879,11 @@ const Header = () => {
 
               {/* Botão Ver Todos */}
               <div className="header__mobile-view-all">
-                <a
-                  href={`#${selectedMobileCategory}`}
+                <button
                   className="header__mobile-view-all-button"
-                  onClick={toggleMobileMenu}
+                  onClick={() => {
+                    handleNavigation(`/produtos?category=${selectedMobileCategory}`);
+                  }}
                 >
                   <span className="header__mobile-view-all-icon">🛍️</span>
                   <div className="header__mobile-view-all-content">
@@ -994,7 +894,7 @@ const Header = () => {
                       {selectedCategory?.title?.replace(/^[^\s]+ /, '')}
                     </span>
                   </div>
-                </a>
+                </button>
               </div>
             </div>
           )}
