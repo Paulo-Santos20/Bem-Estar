@@ -18,7 +18,15 @@ const ProductCarousel = () => {
   const [itemsPerPage, setItemsPerPage] = useState(getItemsPerPage());
   const [notification, setNotification] = useState(null);
   const [addingToCart, setAddingToCart] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 767);
+  
+  // Estados para touch/swipe
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
+  
   const intervalRef = useRef();
+  const carouselRef = useRef();
   const navigate = useNavigate();
 
   // Usar o contexto do carrinho
@@ -30,7 +38,10 @@ const ProductCarousel = () => {
   // Responsividade
   useEffect(() => {
     function handleResize() {
-      setItemsPerPage(getItemsPerPage());
+      const newItemsPerPage = getItemsPerPage();
+      const newIsMobile = window.innerWidth <= 767;
+      setItemsPerPage(newItemsPerPage);
+      setIsMobile(newIsMobile);
     }
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
@@ -45,14 +56,59 @@ const ProductCarousel = () => {
     setStart(prev => (prev - 1 + newProducts.length) % newProducts.length);
   };
 
-  // Auto-play  
+  // Auto-play (pausado no mobile durante interação)
   useEffect(() => {
-    if (newProducts.length > 0) {
+    if (newProducts.length > 0 && !isDragging) {
       clearInterval(intervalRef.current);
       intervalRef.current = setInterval(goToNext, AUTO_INTERVAL);
       return () => clearInterval(intervalRef.current);
     }
-  }, [itemsPerPage, newProducts.length]);
+  }, [itemsPerPage, newProducts.length, isDragging]);
+
+  // ===== FUNÇÕES DE TOUCH/SWIPE =====
+  const handleTouchStart = (e) => {
+    if (!isMobile) return;
+    
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+    setIsDragging(true);
+    
+    // Pausar auto-play durante interação
+    clearInterval(intervalRef.current);
+  };
+
+  const handleTouchMove = (e) => {
+    if (!isMobile) return;
+    setTouchEnd(e.targetTouches[0].clientX);
+  };
+
+  const handleTouchEnd = () => {
+    if (!isMobile || !touchStart || !touchEnd) {
+      setIsDragging(false);
+      return;
+    }
+
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > 50;
+    const isRightSwipe = distance < -50;
+
+    if (isLeftSwipe) {
+      goToNext();
+    }
+
+    if (isRightSwipe) {
+      goToPrev();
+    }
+
+    setIsDragging(false);
+    
+    // Retomar auto-play após 3 segundos
+    setTimeout(() => {
+      if (newProducts.length > 0) {
+        intervalRef.current = setInterval(goToNext, AUTO_INTERVAL);
+      }
+    }, 3000);
+  };
 
   // Função para navegar para página do produto
   const handleProductClick = (product) => {
@@ -104,6 +160,32 @@ const ProductCarousel = () => {
     return Math.round(((originalPrice - price) / originalPrice) * 100);
   };
 
+  // Calcular indicadores de página para mobile
+  const getTotalPages = () => {
+    if (!isMobile) return 0;
+    return newProducts.length;
+  };
+
+  const getCurrentPage = () => {
+    if (!isMobile) return 0;
+    return start;
+  };
+
+  // Ir para página específica (indicadores)
+  const goToPage = (pageIndex) => {
+    if (!isMobile) return;
+    
+    clearInterval(intervalRef.current);
+    setStart(pageIndex);
+    
+    // Retomar auto-play após 3 segundos
+    setTimeout(() => {
+      if (newProducts.length > 0) {
+        intervalRef.current = setInterval(goToNext, AUTO_INTERVAL);
+      }
+    }, 3000);
+  };
+
   // Se não há produtos novos, não renderizar a seção
   if (newProducts.length === 0) {
     return null;
@@ -124,7 +206,9 @@ const ProductCarousel = () => {
               <span className="product-carousel-title-icon">🆕</span>
               Novos Produtos
             </h2>
-            <p className="product-carousel-subtitle">Confira os últimos lançamentos da nossa loja</p>
+            <p className="product-carousel-subtitle">
+              {isMobile ? 'Deslize para ver mais' : 'Confira os últimos lançamentos da nossa loja'}
+            </p>
           </div>
           <button 
             className="product-carousel-viewall"
@@ -134,22 +218,31 @@ const ProductCarousel = () => {
           </button>
         </div>
         
-        <div className="carousel-new-products-outer">
-          <button
-            aria-label="Anterior"
-            className="carousel-arrow-new left"
-            onClick={() => { goToPrev(); clearInterval(intervalRef.current); }}
-            tabIndex={0}
-          >
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
-              <path d="M15.5 19L8.5 12L15.5 5" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
-            </svg>
-          </button>
+        <div 
+          className={`carousel-new-products-outer ${isMobile ? 'mobile-touch' : ''}`}
+          ref={carouselRef}
+          onTouchStart={handleTouchStart}
+          onTouchMove={handleTouchMove}
+          onTouchEnd={handleTouchEnd}
+        >
+          {/* Setas apenas para desktop */}
+          {!isMobile && (
+            <button
+              aria-label="Anterior"
+              className="carousel-arrow-new left"
+              onClick={() => { goToPrev(); clearInterval(intervalRef.current); }}
+              tabIndex={0}
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+                <path d="M15.5 19L8.5 12L15.5 5" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
           
-          <ul className="carousel-new-products-list">
+          <ul className={`carousel-new-products-list ${isMobile ? 'mobile-swipe' : ''}`}>
             {visibleProducts.map((product, idx) => (
               <li 
-                className="carousel-new-products-item" 
+                className={`carousel-new-products-item ${isMobile ? 'mobile-item' : ''}`}
                 key={product.id}
                 onClick={() => handleProductClick(product)}
               >
@@ -249,17 +342,41 @@ const ProductCarousel = () => {
             ))}
           </ul>
           
-          <button
-            aria-label="Próximo"
-            className="carousel-arrow-new right"
-            onClick={() => { goToNext(); clearInterval(intervalRef.current); }}
-            tabIndex={0}
-          >
-            <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
-              <path d="M8.5 5L15.5 12L8.5 19" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
-            </svg>
-          </button>
+          {/* Setas apenas para desktop */}
+          {!isMobile && (
+            <button
+              aria-label="Próximo"
+              className="carousel-arrow-new right"
+              onClick={() => { goToNext(); clearInterval(intervalRef.current); }}
+              tabIndex={0}
+            >
+              <svg viewBox="0 0 24 24" width="22" height="22" fill="none">
+                <path d="M8.5 5L15.5 12L8.5 19" stroke="currentColor" strokeWidth="2.3" strokeLinecap="round" />
+              </svg>
+            </button>
+          )}
         </div>
+
+        {/* Indicadores de página - apenas mobile */}
+        {isMobile && newProducts.length > 1 && (
+          <div className="carousel-indicators">
+            {Array.from({ length: getTotalPages() }).map((_, index) => (
+              <button
+                key={index}
+                className={`carousel-indicator ${index === getCurrentPage() ? 'active' : ''}`}
+                onClick={() => goToPage(index)}
+                aria-label={`Ir para produto ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Contador de página - apenas mobile */}
+        {isMobile && newProducts.length > 1 && (
+          <div className="carousel-page-counter">
+            <span>{getCurrentPage() + 1} de {getTotalPages()}</span>
+          </div>
+        )}
       </div>
 
       {/* Notificação de produto adicionado */}
