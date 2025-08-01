@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../../contexts/CartContext';
+import SearchBar from '../SearchBar/SearchBar';
 import './Header.css';
 
 const Header = () => {
@@ -9,8 +10,6 @@ const Header = () => {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeMainCategory, setActiveMainCategory] = useState('medicamentos');
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
 
   // Estados para navegação mobile hierárquica
@@ -48,7 +47,6 @@ const Header = () => {
     const handleResize = () => {
       if (window.innerWidth > 768) {
         setIsMobileMenuOpen(false);
-        setIsSearchOpen(false);
       }
     };
 
@@ -75,15 +73,6 @@ const Header = () => {
   const itemCount = getCartItemsCount ? getCartItemsCount() : (Array.isArray(cartItems) ? cartItems.length : 0);
   const total = getCartTotal ? getCartTotal() : 0;
   const items = Array.isArray(cartItems) ? cartItems : [];
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/produtos?search=${encodeURIComponent(searchQuery.trim())}`);
-      setSearchQuery('');
-      setIsSearchOpen(false);
-    }
-  };
 
   const toggleCategories = () => {
     setIsCategoriesOpen(!isCategoriesOpen);
@@ -140,16 +129,10 @@ const Header = () => {
     setIsCategoriesOpen(false);
   };
 
-  const handleSearchToggle = () => {
-    setIsSearchOpen(!isSearchOpen);
-    if (!isSearchOpen) {
-      setTimeout(() => {
-        const searchInput = document.querySelector('.header__search-input');
-        if (searchInput) {
-          searchInput.focus();
-        }
-      }, 100);
-    }
+  // Função para fechar SearchBar (callback)
+  const handleSearchClose = () => {
+    // Pode ser usado para fechar outros menus se necessário
+    setIsCategoriesOpen(false);
   };
 
   // Função segura para formatar preço
@@ -407,33 +390,13 @@ const Header = () => {
                 </div>
               </button>
 
-              {/* Busca Central */}
-              <div className={`header__search ${isSearchOpen ? 'header__search--open' : ''}`}>
-                <form className="header__search-form" onSubmit={handleSearch}>
-                  <input
-                    type="text"
-                    placeholder="Busque por medicamentos, vitaminas, beleza..."
-                    className="header__search-input"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                  />
-                  <button type="submit" className="header__search-button">
-                    <span>🔍</span>
-                  </button>
-                </form>
+              {/* SearchBar Integrado */}
+              <div className="header__search-container">
+                <SearchBar onClose={handleSearchClose} />
               </div>
 
               {/* Ações do Header */}
               <div className="header__actions">
-                {/* Busca mobile */}
-                <button
-                  className="header__action header__action--search"
-                  onClick={handleSearchToggle}
-                  aria-label="Buscar"
-                >
-                  🔍
-                </button>
-
                 {/* Favoritos */}
                 <button
                   className="header__action header__action--favorites"
@@ -462,6 +425,7 @@ const Header = () => {
                       <span className="header__cart-badge">{itemCount}</span>
                     )}
                   </button>
+                  
                   {/* Dropdown do Carrinho */}
                   {(isCartOpen || cartContextOpen) && (
                     <div className="header__cart-dropdown">
@@ -540,7 +504,6 @@ const Header = () => {
                       )}
                     </div>
                   )}
-
                 </div>
               </div>
             </div>
@@ -743,22 +706,11 @@ const Header = () => {
           </div>
         </div>
 
-        {/* Busca Mobile */}
+        {/* SearchBar Mobile */}
         <div className="header__mobile-search">
           <div className="container">
             <div className="header__mobile-search-container">
-              <form className="header__mobile-search-form" onSubmit={handleSearch}>
-                <input
-                  type="text"
-                  placeholder="Busque por medicamentos, vitaminas..."
-                  className="header__mobile-search-input"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-                <button type="submit" className="header__mobile-search-button">
-                  <span>🔍</span>
-                </button>
-              </form>
+              <SearchBar onClose={handleSearchClose} />
             </div>
           </div>
         </div>
