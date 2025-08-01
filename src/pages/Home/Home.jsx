@@ -1,7 +1,7 @@
 import React from 'react';
 import { Hero } from '../../components/features/Hero';
 import { ProductCategories } from '../../components/features/ProductCategories';
-import { FeaturedProducts } from '../../components/features/FeaturedProducts';
+import { SaleCarousel } from '../../components/features/SaleCarousel';
 import { ServicesSection } from '../../components/features/ServicesSection';
 import ProductCarousel from '../../components/features/ProductCarousel/ProductCarousel';
 
@@ -13,13 +13,7 @@ export const Home = () => {
       <Hero />
       <ProductCarousel />
       <ProductCategories />
-      <FeaturedProducts
-        title="Produtos em Destaque"
-        subtitle="Confira nossos produtos mais vendidos e novidades"
-        maxProducts={8}
-        showFilters={true}
-        showViewAll={true}
-      />
+      <SaleCarousel/>
       <ServicesSection />
     </div>
   );
